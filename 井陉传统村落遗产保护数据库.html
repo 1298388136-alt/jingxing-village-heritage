@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="井陉县传统村落人口、文物古迹与非物质文化遗产查询">
+  <title>井陉传统村落 · 遗产档案</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f6f4ec;
+      --paper-deep: #ebe7d9;
+      --ink: #263b32;
+      --ink-soft: #647267;
+      --green: #49624f;
+      --green-deep: #344a3c;
+      --line: #e5e2d8;
+      --red: #a44f3b;
+      --white: #fffefa;
+      --shadow: 0 18px 48px rgba(42, 53, 43, .08);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    button, input, select { font: inherit; }
+    button, select { color: inherit; }
+    .shell { width: min(1120px, calc(100% - 48px)); margin-inline: auto; }
+    .masthead {
+      position: relative;
+      overflow: hidden;
+      padding: 28px 0 66px;
+      background:
+        radial-gradient(ellipse at 89% 40%, rgba(150, 153, 111, .16), transparent 32%),
+        linear-gradient(118deg, #eeece2 0%, #f5f2e9 54%, #e9e8dc 100%);
+      border-bottom: 1px solid #e2dfd2;
+    }
+    .masthead::after {
+      position: absolute;
+      right: -110px;
+      bottom: -258px;
+      width: 590px;
+      height: 590px;
+      border: 1px solid rgba(73, 98, 79, .12);
+      border-radius: 50%;
+      box-shadow: 0 0 0 26px rgba(73, 98, 79, .025), 0 0 0 52px rgba(73, 98, 79, .025);
+      content: "";
+      pointer-events: none;
+    }
+    .topline, .brand, .masthead-note, .toolbar, .section-heading, .result-line {
+      display: flex;
+      align-items: center;
+    }
+    .topline { justify-content: space-between; }
+    .brand { gap: 12px; text-decoration: none; color: var(--ink); }
+    .seal {
+      display: grid;
+      width: 40px;
+      height: 40px;
+      place-items: center;
+      border: 1px solid rgba(164, 79, 59, .56);
+      color: var(--red);
+      font-family: "STSong", "SimSun", serif;
+      font-size: 20px;
+      font-weight: 700;
+    }
+    .brand-name { font-family: "STSong", "SimSun", serif; font-size: 16px; letter-spacing: .08em; }
+    .topline-label {
+      color: var(--ink-soft);
+      font-size: 11px;
+      letter-spacing: .17em;
+    }
+    .hero { position: relative; z-index: 1; padding-top: 54px; }
+    .eyebrow { color: var(--red); font-size: 11px; letter-spacing: .2em; }
+    h1 {
+      margin: 13px 0 13px;
+      font-family: "STSong", "SimSun", "Noto Serif CJK SC", serif;
+      font-size: clamp(34px, 5vw, 54px);
+      font-weight: 500;
+      letter-spacing: .075em;
+      line-height: 1.25;
+    }
+    h1 span { color: var(--green); }
+    .hero-copy { max-width: 540px; margin: 0; color: var(--ink-soft); font-size: 14px; }
+    .masthead-note { gap: 9px; margin-top: 27px; color: var(--ink-soft); font-size: 12px; }
+    .masthead-note::before { width: 24px; height: 1px; background: var(--red); content: ""; }
+    main { position: relative; z-index: 2; margin-top: -27px; padding-bottom: 52px; }
+    .overview {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, .8);
+      border-radius: 5px;
+      background: var(--white);
+      box-shadow: var(--shadow);
+    }
+    .stat { min-height: 102px; padding: 19px 24px; border-right: 1px solid var(--line); }
+    .stat:last-child { border-right: 0; }
+    .stat-label { color: var(--ink-soft); font-size: 12px; }
+    .stat-value { margin-top: 5px; font-family: "STSong", "SimSun", serif; font-size: 27px; line-height: 1.2; }
+    .stat-unit { margin-left: 5px; color: var(--ink-soft); font-family: inherit; font-size: 12px; }
+    .source-note {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin: 21px 0 28px;
+      padding: 12px 15px;
+      border-left: 2px solid #b77a62;
+      background: rgba(255, 254, 250, .62);
+      color: var(--ink-soft);
+      font-size: 12px;
+    }
+    .source-mark { flex: 0 0 auto; color: var(--red); font-family: "STSong", "SimSun", serif; }
+    .section-heading { justify-content: space-between; gap: 16px; margin-bottom: 15px; }
+    h2 { margin: 0; font-family: "STSong", "SimSun", serif; font-size: 21px; font-weight: 500; letter-spacing: .06em; }
+    .section-kicker { margin-top: 2px; color: var(--ink-soft); font-size: 11px; letter-spacing: .1em; }
+    .toolbar { flex-wrap: wrap; gap: 9px; margin-bottom: 11px; }
+    .search-wrap { position: relative; flex: 1 1 260px; min-width: 210px; }
+    .search-icon { position: absolute; top: 50%; left: 13px; color: #758175; font-size: 16px; transform: translateY(-52%); }
+    .search-input, .filter-select {
+      height: 42px;
+      border: 1px solid #deded2;
+      border-radius: 3px;
+      outline: none;
+      background: var(--white);
+    }
+    .search-input { width: 100%; padding: 0 13px 0 38px; }
+    .search-input::placeholder { color: #969b90; }
+    .search-input:focus, .filter-select:focus { border-color: #829681; box-shadow: 0 0 0 3px rgba(73, 98, 79, .1); }
+    .filter-select { min-width: 132px; padding: 0 30px 0 12px; }
+    .export-button, .detail-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #ccd3c8;
+      border-radius: 3px;
+      background: transparent;
+      color: var(--green-deep);
+      cursor: pointer;
+      transition: background .15s ease, border-color .15s ease;
+    }
+    .export-button { height: 42px; padding: 0 15px; white-space: nowrap; }
+    .export-button:hover, .detail-button:hover { border-color: var(--green); background: #edf0e9; }
+    .result-line { justify-content: space-between; gap: 12px; margin: 10px 0 9px; color: var(--ink-soft); font-size: 12px; }
+    .result-count { color: var(--green-deep); font-weight: 600; }
+    .table-frame { overflow: auto; border: 1px solid #e6e2d7; border-radius: 4px; background: var(--white); box-shadow: 0 9px 24px rgba(42, 53, 43, .035); }
+    table { width: 100%; min-width: 790px; border-collapse: collapse; text-align: left; }
+    th {
+      height: 43px;
+      padding: 0 13px;
+      background: #eeeee5;
+      color: #657167;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: .06em;
+      white-space: nowrap;
+    }
+    td { padding: 12px 13px; border-top: 1px solid #efede6; color: #4f5d52; vertical-align: middle; }
+    tbody tr { transition: background .12s ease; }
+    tbody tr:hover { background: #f7f7f0; }
+    td.number { width: 50px; color: #98a093; font-family: "STSong", "SimSun", serif; }
+    .village-name { color: var(--ink); font-family: "STSong", "SimSun", serif; font-size: 16px; white-space: nowrap; }
+    .town-name { margin-top: 2px; color: #8a9286; font-size: 11px; }
+    td.numeric { font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .hollow-value { color: var(--green-deep); font-variant-numeric: tabular-nums; }
+    .hollow-value.high { color: var(--red); }
+    .heritage-tags { display: flex; flex-wrap: wrap; gap: 5px; min-width: 135px; }
+    .tag {
+      padding: 2px 6px;
+      border: 1px solid #dce2d7;
+      border-radius: 2px;
+      background: #f3f5ef;
+      color: #50654f;
+      font-size: 10px;
+      white-space: nowrap;
+    }
+    .tag-empty { color: #989e92; }
+    .detail-button { padding: 5px 10px; font-size: 11px; white-space: nowrap; }
+    .empty-state { padding: 38px 18px; color: var(--ink-soft); text-align: center; }
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      padding-top: 18px;
+      border-top: 1px solid #e3e0d5;
+      color: #858d81;
+      font-size: 11px;
+    }
+    dialog {
+      width: min(650px, calc(100% - 30px));
+      max-height: min(82vh, 760px);
+      padding: 0;
+      overflow: auto;
+      border: 1px solid #dcd9ce;
+      border-radius: 5px;
+      background: var(--white);
+      color: var(--ink);
+      box-shadow: 0 24px 90px rgba(25, 35, 28, .24);
+    }
+    dialog::backdrop { background: rgba(31, 40, 33, .47); backdrop-filter: blur(2px); }
+    .dialog-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; padding: 22px 25px 17px; border-bottom: 1px solid var(--line); background: #f2f1e9; }
+    .dialog-eyebrow { color: var(--red); font-size: 10px; letter-spacing: .14em; }
+    .dialog-head h2 { margin-top: 5px; font-size: 25px; }
+    .dialog-town { margin-top: 3px; color: var(--ink-soft); font-size: 12px; }
+    .close-button { display: grid; width: 30px; height: 30px; flex: 0 0 auto; place-items: center; border: 1px solid #d6d6ca; border-radius: 50%; background: transparent; color: var(--ink-soft); cursor: pointer; font-size: 17px; }
+    .close-button:hover { background: white; color: var(--ink); }
+    .dialog-content { padding: 19px 25px 26px; }
+    .detail-section + .detail-section { margin-top: 20px; }
+    .detail-section h3 { display: flex; align-items: center; gap: 9px; margin: 0 0 9px; color: var(--green-deep); font-size: 13px; font-weight: 600; }
+    .detail-section h3::before { width: 3px; height: 14px; background: var(--red); content: ""; }
+    .metric-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .metric { padding: 11px 12px; border: 1px solid #ece9df; background: #fbfaf6; }
+    .metric-label { display: block; color: var(--ink-soft); font-size: 11px; }
+    .metric strong { display: block; margin-top: 3px; font-size: 17px; font-weight: 500; font-variant-numeric: tabular-nums; }
+    .asset-list { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0; padding: 0; list-style: none; }
+    .asset-item { padding: 10px 12px; border: 1px solid #ece9df; background: #fbfaf6; }
+    .asset-label { display: block; margin-bottom: 3px; color: var(--ink-soft); font-size: 11px; }
+    .asset-item strong { font-size: 13px; font-weight: 500; }
+    .asset-item strong.zero { color: #8e9689; font-weight: 400; }
+    .dialog-source { margin: 17px 0 0; color: #848d81; font-size: 10px; line-height: 1.6; }
+    @media (max-width: 720px) {
+      .shell { width: min(100% - 30px, 560px); }
+      .masthead { padding: 18px 0 55px; }
+      .topline-label { font-size: 9px; letter-spacing: .1em; }
+      .brand-name { font-size: 14px; }
+      .hero { padding-top: 43px; }
+      .hero-copy { max-width: 390px; font-size: 13px; }
+      .overview { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .stat { min-height: 85px; padding: 13px 16px; }
+      .stat:nth-child(2) { border-right: 0; }
+      .stat:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+      .stat-value { font-size: 24px; }
+      .section-heading { align-items: flex-start; }
+      .toolbar { gap: 7px; }
+      .search-wrap { flex-basis: 100%; }
+      .filter-select { flex: 1 1 145px; min-width: 0; }
+      .export-button { flex: 0 0 auto; }
+      .footer { flex-direction: column; gap: 3px; }
+    }
+    @media (max-width: 420px) {
+      .shell { width: calc(100% - 24px); }
+      .topline-label { max-width: 110px; text-align: right; }
+      .section-heading { flex-direction: column; gap: 4px; }
+      .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .asset-list { grid-template-columns: 1fr; }
+      .dialog-head, .dialog-content { padding-right: 17px; padding-left: 17px; }
+    }
+    @media print {
+      body { background: white; }
+      .masthead { padding-bottom: 36px; background: white; }
+      .masthead::after, .toolbar, .detail-button, dialog { display: none !important; }
+      main { margin-top: 0; }
+      .table-frame, .overview { box-shadow: none; }
+      .table-frame { overflow: visible; }
+      table { min-width: 0; font-size: 9px; }
+      th, td { padding: 5px; }
+      .footer { margin-top: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="masthead">
+    <div class="shell">
+      <div class="topline">
+        <a class="brand" href="#" aria-label="井陉传统村落遗产档案首页">
+          <span class="seal" aria-hidden="true">陉</span>
+          <span class="brand-name">井陉 · 古村留痕</span>
+        </a>
+        <span class="topline-label">传统村落集中连片保护利用规划 · 2022—2035</span>
+      </div>
+      <div class="hero">
+        <div class="eyebrow">SHIJIAZHUANG · JINGXING</div>
+        <h1>传统村落<br><span>遗产档案</span></h1>
+        <p class="hero-copy">以村为卷，记录井陉传统村落的人口肌理、文物古迹与乡土技艺。让历史有据可查，让保护落到村庄日常。</p>
+        <div class="masthead-note">传统村落集中连片保护利用片区 · 村落名录</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="overview" aria-label="片区统计概览">
+      <div class="stat"><div class="stat-label">传统村落</div><div class="stat-value"><span id="village-total">—</span><span class="stat-unit">个</span></div></div>
+      <div class="stat"><div class="stat-label">常住人口</div><div class="stat-value"><span id="resident-total">—</span><span class="stat-unit">人</span></div></div>
+      <div class="stat"><div class="stat-label">历史建筑</div><div class="stat-value"><span id="historic-total">—</span><span class="stat-unit">处</span></div></div>
+      <div class="stat"><div class="stat-label">非物质文化遗产</div><div class="stat-value"><span id="intangible-total">—</span><span class="stat-unit">项</span></div></div>
+    </section>
+
+    <aside class="source-note">
+      <span class="source-mark" aria-hidden="true">注</span>
+      <span>数据来源：规划总报告第13—14页表2-4、表2-5、表2-6。国家级文保单位的片区合计按报告概述的去重口径统计为3处；分村记录保留原表列示。</span>
+    </aside>
+
+    <section aria-labelledby="records-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="records-title">村落名录</h2>
+          <div class="section-kicker">VILLAGE REGISTER · HERITAGE &amp; COMMUNITY</div>
+        </div>
+      </div>
+      <div class="toolbar" role="search" aria-label="筛选村落档案">
+        <label class="search-wrap">
+          <span class="search-icon" aria-hidden="true">⌕</span>
+          <input class="search-input" id="search" type="search" placeholder="搜索村名、乡镇或遗产名称…" autocomplete="off">
+        </label>
+        <label>
+          <span class="sr-only">按乡镇筛选</span>
+          <select class="filter-select" id="town-filter" aria-label="按乡镇筛选">
+            <option value="">全部乡镇</option>
+          </select>
+        </label>
+        <label>
+          <span class="sr-only">按遗产类别筛选</span>
+          <select class="filter-select" id="asset-filter" aria-label="按遗产类别筛选">
+            <option value="">全部遗产类别</option>
+            <option value="nationalRelic">国家级文保</option>
+            <option value="provincialRelic">省级文保</option>
+            <option value="county">县级非遗</option>
+            <option value="city">市级非遗</option>
+            <option value="provincial">省级非遗</option>
+            <option value="national">国家级非遗</option>
+          </select>
+        </label>
+        <button class="export-button" id="export" type="button" title="导出当前筛选结果为 CSV">导出表格 ↓</button>
+      </div>
+      <div class="result-line">
+        <span id="result-count" class="result-count" aria-live="polite"></span>
+        <span>点击村落档案，查看人口、文物及非遗详情</span>
+      </div>
+      <div class="table-frame">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">序号</th>
+              <th scope="col">村落</th>
+              <th scope="col">人口 户籍 / 常住</th>
+              <th scope="col">空心率</th>
+              <th scope="col">历史建筑</th>
+              <th scope="col">一般文物点</th>
+              <th scope="col">重点文保</th>
+              <th scope="col">非遗项目</th>
+              <th scope="col"><span class="sr-only">档案详情</span></th>
+            </tr>
+          </thead>
+          <tbody id="village-rows"></tbody>
+        </table>
+        <div class="empty-state" id="empty-state" hidden>没有找到符合条件的村落，请调整搜索词或筛选条件。</div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span>井陉县传统村落集中连片保护利用规划成果</span>
+      <span>本页面为本地离线档案浏览工具 · 数据以规划报告原表为准</span>
+    </footer>
+  </main>
+
+  <dialog id="record-dialog" aria-labelledby="dialog-title">
+    <div class="dialog-head">
+      <div>
+        <div class="dialog-eyebrow">VILLAGE HERITAGE RECORD</div>
+        <h2 id="dialog-title"></h2>
+        <div class="dialog-town" id="dialog-town"></div>
+      </div>
+      <button class="close-button" type="button" aria-label="关闭档案详情" data-close>×</button>
+    </div>
+    <div class="dialog-content" id="dialog-content"></div>
+  </dialog>
+
+  <script>
+    const DATA = [{"id":1,"town":"秀林镇","village":"南横口村","registered":1338,"resident":820,"hollow":0.61,"historic":11,"general":11,"provincialRelicCount":0,"provincialRelicNames":"","nationalRelicCount":1,"nationalRelicNames":"井陉窑遗址","county":0,"countyNames":"","city":0,"cityNames":"","provincial":1,"provincialNames":"井陉窑传统烧制技艺","national":0,"nationalNames":""},{"id":2,"town":"于家乡","village":"于家村","registered":1450,"resident":510,"hollow":0.35,"historic":261,"general":20,"provincialRelicCount":1,"provincialRelicNames":"于家村古村落","nationalRelicCount":0,"nationalRelicNames":"","county":0,"countyNames":"","city":0,"cityNames":"","provincial":1,"provincialNames":"于家石头建筑技艺","national":0,"nationalNames":""},{"id":3,"town":"于家乡","village":"南张井村","registered":600,"resident":200,"hollow":0.33,"historic":0,"general":3,"provincialRelicCount":0,"provincialRelicNames":"","nationalRelicCount":0,"nationalRelicNames":"","county":0,"countyNames":"","city":0,"cityNames":"","provincial":1,"provincialNames":"南张井干礤石墙技艺","national":1,"nationalNames":"南张井老虎火"},{"id":4,"town":"于家乡","village":"张家村","registered":352,"resident":150,"hollow":0.43,"historic":0,"general":6,"provincialRelicCount":0,"provincialRelicNames":"","nationalRelicCount":0,"nationalRelicNames":"","county":0,"countyNames":"","city":0,"cityNames":"","provincial":0,"provincialNames":"","national":0,"nationalNames":""},{"id":5,"town":"于家乡","village":"狼窝村","registered":1570,"resident":600,"hollow":0.38,"historic":0,"general":3,"provincialRelicCount":0,"provincialRelicNames":"","nationalRelicCount":0,"nationalRelicNames":"","county":0,"countyNames":"","city":0,"cityNames":"","provincial":0,"provincialNames":"","national":0,"nationalNames":""},{"id":6,"town":"于家乡","village":"高家坡村","registered":760,"resident":380,"hollow":0.5,"historic":0,"general":11,"provincialRelicCount":0,"provincialRelicNames":"","nationalRelicCount":0,"nationalRelicNames":"","county":2,"countyNames":"井陉扎笤帚技艺、井陉枣酒酿造技艺","city":1,"cityNames":"石家庄丝弦（高家坡丝弦）","provincial":0,"provincialNames":"","national":0,"nationalNames":""},{"id":7,"town":"于家乡","village":"水窑洼村","registered":180,"resident":60,"hollow":0.33,"historic":0,"general":3,"provincialRelicCount":0,"provincialRelicNames":"","nationalRelicCount":0,"nationalRelicNames":"","county":0,"countyNames":"","city":0,"cityNames":"","provincial":0,"provincialNames":"","national":0,"nationalNames":""},{"id":8,"town":"于家乡","village":"当泉村","registered":713,"resident":265,"hollow":0.37,"historic":0,"general":7,"provincialRelicCount":0,"provincialRelicNames":"","nationalRelicCount":0,"nationalRelicNames":"","county":0,"countyNames":"","city":0,"cityNames":"","provincial":0,"provincialNames":"","national":0,"nationalNames":""},{"id":9,"town":"南障城镇","village":"大梁江村","registered":945,"resident":240,"hollow":0.25,"historic":145,"general":27,"provincialRelicCount":0,"provincialRelicNames":"","nationalRelicCount":0,"nationalRelicNames":"","county":0,"countyNames":"","city":1,"cityNames":"大梁江开锁儿","provincial":0,"provincialNames":"","national":0,"nationalNames":""},{"id":10,"town":"南障城镇","village":"吕家村","registered":393,"resident":106,"hollow":0.27,"historic":35,"general":2,"provincialRelicCount":0,"provincialRelicNames":"","nationalRelicCount":0,"nationalRelicNames":"","county":0,"countyNames":"","city":1,"cityNames":"吕氏古法榨油技艺","provincial":0,"provincialNames":"","national":0,"nationalNames":""},{"id":11,"town":"南障城镇","village":"七狮村","registered":618,"resident":240,"hollow":0.39,"historic":0,"general":2,"provincialRelicCount":1,"provincialRelicNames":"千佛崖石窟","nationalRelicCount":0,"nationalRelicNames":"","county":0,"countyNames":"","city":0,"cityNames":"","provincial":0,"provincialNames":"","national":0,"nationalNames":""},{"id":12,"town":"南障城镇","village":"小梁江村","registered":440,"resident":180,"hollow":0.41,"historic":0,"general":2,"provincialRelicCount":0,"provincialRelicNames":"","nationalRelicCount":0,"nationalRelicNames":"","county":0,"countyNames":"","city":0,"cityNames":"","provincial":0,"provincialNames":"","national":0,"nationalNames":""},{"id":13,"town":"南障城镇","village":"大王帮村","registered":625,"resident":200,"hollow":0.32,"historic":0,"general":0,"provincialRelicCount":0,"provincialRelicNames":"","nationalRelicCount":0,"nationalRelicNames":"","county":0,"countyNames":"","city":0,"cityNames":"","provincial":0,"provincialNames":"","national":0,"nationalNames":""},{"id":14,"town":"天长镇","village":"梁家村","registered":453,"resident":220,"hollow":0.49,"historic":0,"general":7,"provincialRelicCount":0,"provincialRelicNames":"","nationalRelicCount":0,"nationalRelicNames":"","county":0,"countyNames":"","city":0,"cityNames":"","provincial":1,"provincialNames":"梁家鹦垴拳","national":0,"nationalNames":""},{"id":15,"town":"天长镇","village":"宋古城村","registered":453,"resident":220,"hollow":0.49,"historic":98,"general":3,"provincialRelicCount":1,"provincialRelicNames":"井陉日伪驻军旧址","nationalRelicCount":3,"nationalRelicNames":"井陉窑遗址、井陉古驿道、旧城城墙","county":0,"countyNames":"","city":0,"cityNames":"","provincial":0,"provincialNames":"","national":0,"nationalNames":""},{"id":16,"town":"天长镇","village":"小龙窝村","registered":700,"resident":300,"hollow":0.43,"historic":70,"general":12,"provincialRelicCount":1,"provincialRelicNames":"龙窝寺石窟","nationalRelicCount":1,"nationalRelicNames":"井陉古驿道","county":0,"countyNames":"","city":0,"cityNames":"","provincial":0,"provincialNames":"","national":0,"nationalNames":""},{"id":17,"town":"天长镇","village":"核桃园村","registered":2230,"resident":1300,"hollow":0.58,"historic":0,"general":18,"provincialRelicCount":0,"provincialRelicNames":"","nationalRelicCount":1,"nationalRelicNames":"井陉古驿道","county":0,"countyNames":"","city":3,"cityNames":"核桃园扇令官、核桃园拖刀面制作技艺、井陉红脸社火","provincial":1,"provincialNames":"核桃园打树花","national":0,"nationalNames":""},{"id":18,"town":"天长镇","village":"长生口村","registered":1150,"resident":460,"hollow":0.4,"historic":0,"general":12,"provincialRelicCount":0,"provincialRelicNames":"","nationalRelicCount":1,"nationalRelicNames":"井陉古驿道","county":1,"countyNames":"井陉刺绣","city":0,"cityNames":"","provincial":0,"provincialNames":"","national":0,"nationalNames":""},{"id":19,"town":"天长镇","village":"吴家垴村","registered":410,"resident":275,"hollow":0.67,"historic":0,"general":4,"provincialRelicCount":0,"provincialRelicNames":"","nationalRelicCount":0,"nationalRelicNames":"","county":0,"countyNames":"","city":0,"cityNames":"","provincial":0,"provincialNames":"","national":0,"nationalNames":""},{"id":20,"town":"天长镇","village":"庄旺村","registered":896,"resident":398,"hollow":0.44,"historic":0,"general":5,"provincialRelicCount":0,"provincialRelicNames":"","nationalRelicCount":0,"nationalRelicNames":"","county":0,"countyNames":"","city":0,"cityNames":"","provincial":0,"provincialNames":"","national":0,"nationalNames":""},{"id":21,"town":"天长镇","village":"板桥村","registered":1340,"resident":540,"hollow":0.4,"historic":0,"general":4,"provincialRelicCount":0,"provincialRelicNames":"","nationalRelicCount":1,"nationalRelicNames":"井陉古驿道","county":1,"countyNames":"井陉板桥求雨","city":1,"cityNames":"板桥秦皇古乐","provincial":1,"provincialNames":"九曲黄河灯","national":0,"nationalNames":""},{"id":22,"town":"天长镇","village":"石桥头村","registered":890,"resident":500,"hollow":0.56,"historic":0,"general":6,"provincialRelicCount":1,"provincialRelicNames":"通济桥","nationalRelicCount":1,"nationalRelicNames":"井陉古驿道","county":1,"countyNames":"石桥头花脸社火","city":0,"cityNames":"","provincial":1,"provincialNames":"东岳祭典","national":0,"nationalNames":""},{"id":23,"town":"天长镇","village":"乏驴岭村","registered":405,"resident":180,"hollow":0.44,"historic":0,"general":9,"provincialRelicCount":2,"provincialRelicNames":"乏驴岭铁桥、井陉日伪驻军旧址","nationalRelicCount":1,"nationalRelicNames":"井陉古驿道","county":0,"countyNames":"","city":0,"cityNames":"","provincial":0,"provincialNames":"","national":0,"nationalNames":""},{"id":24,"town":"天长镇","village":"北关村","registered":2230,"resident":1887,"hollow":0.85,"historic":0,"general":27,"provincialRelicCount":0,"provincialRelicNames":"","nationalRelicCount":0,"nationalRelicNames":"","county":0,"countyNames":"","city":0,"cityNames":"","provincial":0,"provincialNames":"","national":0,"nationalNames":""},{"id":25,"town":"天长镇","village":"东关村","registered":1172,"resident":680,"hollow":0.58,"historic":0,"general":29,"provincialRelicCount":2,"provincialRelicNames":"天长镇大石桥、唐家垴墓群","nationalRelicCount":1,"nationalRelicNames":"井陉窑遗址","county":1,"countyNames":"东关渔家乐","city":0,"cityNames":"","provincial":0,"provincialNames":"","national":0,"nationalNames":""},{"id":26,"town":"天长镇","village":"河东村","registered":1668,"resident":1421,"hollow":0.85,"historic":0,"general":4,"provincialRelicCount":0,"provincialRelicNames":"","nationalRelicCount":2,"nationalRelicNames":"井陉古驿道、井陉窑遗址","county":0,"countyNames":"","city":0,"cityNames":"","provincial":0,"provincialNames":"","national":0,"nationalNames":""}];
+    const numberFormat = new Intl.NumberFormat("zh-CN");
+    const $ = (selector) => document.querySelector(selector);
+
+    function intangibleCount(record) {
+      return record.county + record.city + record.provincial + record.national;
+    }
+
+    function renderOverview() {
+      $("#village-total").textContent = numberFormat.format(DATA.length);
+      $("#resident-total").textContent = numberFormat.format(DATA.reduce((sum, item) => sum + item.resident, 0));
+      $("#historic-total").textContent = numberFormat.format(DATA.reduce((sum, item) => sum + item.historic, 0));
+      $("#intangible-total").textContent = numberFormat.format(DATA.reduce((sum, item) => sum + intangibleCount(item), 0));
+    }
+
+    function addTextCell(row, text, className) {
+      const cell = document.createElement("td");
+      if (className) cell.className = className;
+      cell.textContent = text;
+      row.append(cell);
+      return cell;
+    }
+
+    function activeAssets(record) {
+      return [
+        ["nationalRelic", record.nationalRelicCount],
+        ["provincialRelic", record.provincialRelicCount],
+        ["county", record.county],
+        ["city", record.city],
+        ["provincial", record.provincial],
+        ["national", record.national]
+      ];
+    }
+
+    function matchesAsset(record, filter) {
+      if (!filter) return true;
+      if (filter === "nationalRelic") return record.nationalRelicCount > 0;
+      if (filter === "provincialRelic") return record.provincialRelicCount > 0;
+      return record[filter] > 0;
+    }
+
+    function getVisibleRecords() {
+      const query = $("#search").value.trim().toLocaleLowerCase();
+      const town = $("#town-filter").value;
+      const asset = $("#asset-filter").value;
+      return DATA.filter((item) => {
+        const searchable = [
+          item.village, item.town, item.provincialRelicNames, item.nationalRelicNames,
+          item.countyNames, item.cityNames, item.provincialNames, item.nationalNames
+        ].join(" ").toLocaleLowerCase();
+        return (!query || searchable.includes(query)) && (!town || item.town === town) && matchesAsset(item, asset);
+      });
+    }
+
+    function renderTable() {
+      const records = getVisibleRecords();
+      const body = $("#village-rows");
+      body.replaceChildren();
+      $("#empty-state").hidden = records.length !== 0;
+      $(".table-frame table").hidden = records.length === 0;
+      $("#result-count").textContent = `共 ${records.length} 个村落`;
+
+      for (const record of records) {
+        const row = document.createElement("tr");
+        addTextCell(row, String(record.id).padStart(2, "0"), "number");
+
+        const villageCell = document.createElement("td");
+        const villageName = document.createElement("div");
+        villageName.className = "village-name";
+        villageName.textContent = record.village;
+        const townName = document.createElement("div");
+        townName.className = "town-name";
+        townName.textContent = record.town;
+        villageCell.append(villageName, townName);
+        row.append(villageCell);
+
+        addTextCell(row, `${numberFormat.format(record.registered)} / ${numberFormat.format(record.resident)}`, "numeric");
+        const hollow = addTextCell(row, `${Math.round(record.hollow * 100)}%`, "hollow-value");
+        if (record.hollow >= 0.7) hollow.classList.add("high");
+        addTextCell(row, numberFormat.format(record.historic), "numeric");
+        addTextCell(row, numberFormat.format(record.general), "numeric");
+
+        const protectionCell = document.createElement("td");
+        const protectionTags = document.createElement("div");
+        protectionTags.className = "heritage-tags";
+        const protection = [
+          ["国保", record.nationalRelicCount],
+          ["省保", record.provincialRelicCount]
+        ].filter(([, count]) => count > 0);
+        for (const [label, count] of protection) {
+          const tag = document.createElement("span");
+          tag.className = "tag";
+          tag.textContent = `${label} ${count}`;
+          protectionTags.append(tag);
+        }
+        if (protection.length === 0) {
+          const tag = document.createElement("span");
+          tag.className = "tag tag-empty";
+          tag.textContent = "—";
+          protectionTags.append(tag);
+        }
+        protectionCell.append(protectionTags);
+        row.append(protectionCell);
+
+        const intangibleCell = document.createElement("td");
+        const intangibleTags = document.createElement("div");
+        intangibleTags.className = "heritage-tags";
+        const categoryLabels = [
+          ["国家", record.national], ["省", record.provincial],
+          ["市", record.city], ["县", record.county]
+        ];
+        const presentCategories = categoryLabels.filter(([, count]) => count > 0);
+        if (presentCategories.length === 0) {
+          const tag = document.createElement("span");
+          tag.className = "tag tag-empty";
+          tag.textContent = "—";
+          intangibleTags.append(tag);
+        } else {
+          for (const [label, count] of presentCategories) {
+            const tag = document.createElement("span");
+            tag.className = "tag";
+            tag.textContent = `${label} ${count}`;
+            intangibleTags.append(tag);
+          }
+        }
+        intangibleCell.append(intangibleTags);
+        row.append(intangibleCell);
+
+        const actionCell = document.createElement("td");
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "detail-button";
+        button.dataset.recordId = String(record.id);
+        button.textContent = "查看档案";
+        actionCell.append(button);
+        row.append(actionCell);
+        body.append(row);
+      }
+    }
+
+    function populateTowns() {
+      const towns = [...new Set(DATA.map((record) => record.town))];
+      for (const town of towns) {
+        const option = document.createElement("option");
+        option.value = town;
+        option.textContent = town;
+        $("#town-filter").append(option);
+      }
+    }
+
+    function appendDetailSection(container, title, entries) {
+      const section = document.createElement("section");
+      section.className = "detail-section";
+      const heading = document.createElement("h3");
+      heading.textContent = title;
+      const list = document.createElement("ul");
+      list.className = "asset-list";
+      for (const [label, count, names, unit] of entries) {
+        const item = document.createElement("li");
+        item.className = "asset-item";
+        const itemLabel = document.createElement("span");
+        itemLabel.className = "asset-label";
+        itemLabel.textContent = label;
+        const value = document.createElement("strong");
+        const hasAssets = count > 0;
+        value.className = hasAssets ? "" : "zero";
+        value.textContent = hasAssets ? `${count} ${unit}${names ? ` · ${names}` : ""}` : `0 ${unit}`;
+        item.append(itemLabel, value);
+        list.append(item);
+      }
+      section.append(heading, list);
+      container.append(section);
+    }
+
+    function openRecord(id) {
+      const record = DATA.find((item) => item.id === id);
+      if (!record) return;
+      $("#dialog-title").textContent = record.village;
+      $("#dialog-town").textContent = `${record.town} · 第 ${record.id} 号村落`;
+      const content = $("#dialog-content");
+      content.replaceChildren();
+
+      const population = document.createElement("section");
+      population.className = "detail-section";
+      const populationHeading = document.createElement("h3");
+      populationHeading.textContent = "人口与村落";
+      const metrics = document.createElement("div");
+      metrics.className = "metric-grid";
+      for (const [label, value] of [
+        ["户籍人口", `${numberFormat.format(record.registered)} 人`],
+        ["常住人口", `${numberFormat.format(record.resident)} 人`],
+        ["空心率", `${(record.hollow * 100).toFixed(0)}%`]
+      ]) {
+        const metric = document.createElement("div");
+        metric.className = "metric";
+        const metricLabel = document.createElement("span");
+        metricLabel.className = "metric-label";
+        metricLabel.textContent = label;
+        const metricValue = document.createElement("strong");
+        metricValue.textContent = value;
+        metric.append(metricLabel, metricValue);
+        metrics.append(metric);
+      }
+      population.append(populationHeading, metrics);
+      content.append(population);
+
+      appendDetailSection(content, "文物古迹", [
+        ["历史建筑", record.historic, "", "处"],
+        ["一般文物点", record.general, "", "处"],
+        ["省级文保单位", record.provincialRelicCount, record.provincialRelicNames, "处"],
+        ["国家级文保单位", record.nationalRelicCount, record.nationalRelicNames, "处"]
+      ]);
+      appendDetailSection(content, "非物质文化遗产", [
+        ["县级非遗", record.county, record.countyNames, "项"],
+        ["市级非遗", record.city, record.cityNames, "项"],
+        ["省级非遗", record.provincial, record.provincialNames, "项"],
+        ["国家级非遗", record.national, record.nationalNames, "项"]
+      ]);
+      const source = document.createElement("p");
+      source.className = "dialog-source";
+      source.textContent = "数据来源：规划总报告第13—14页表2-4、表2-5、表2-6。名称与数量依原表登记。";
+      content.append(source);
+      $("#record-dialog").showModal();
+    }
+
+    function exportCsv() {
+      const headers = [
+        "序号", "所属乡镇", "村名", "户籍人口（人）", "常住人口（人）", "空心率（常住/户籍）",
+        "历史建筑（处）", "一般文物点（处）", "省级文保单位数量（处）", "省级文保单位名称",
+        "国家级文保单位数量（处）", "国家级文保单位名称", "县级非遗数量（项）", "县级非遗项目名称",
+        "市级非遗数量（项）", "市级非遗项目名称", "省级非遗数量（项）", "省级非遗项目名称",
+        "国家级非遗数量（项）", "国家级非遗项目名称"
+      ];
+      const rows = getVisibleRecords().map((item) => [
+        item.id, item.town, item.village, item.registered, item.resident, item.hollow.toFixed(2),
+        item.historic, item.general, item.provincialRelicCount, item.provincialRelicNames,
+        item.nationalRelicCount, item.nationalRelicNames, item.county, item.countyNames,
+        item.city, item.cityNames, item.provincial, item.provincialNames, item.national, item.nationalNames
+      ]);
+      const csv = [headers, ...rows].map((row) =>
+        row.map((value) => `"${String(value ?? "").replaceAll('"', '""')}"`).join(",")
+      ).join("\r\n");
+      const blob = new Blob(["\uFEFF", csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "井陉传统村落遗产档案.csv";
+      link.click();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    $("#search").addEventListener("input", renderTable);
+    $("#town-filter").addEventListener("change", renderTable);
+    $("#asset-filter").addEventListener("change", renderTable);
+    $("#export").addEventListener("click", exportCsv);
+    $("#village-rows").addEventListener("click", (event) => {
+      const button = event.target.closest("[data-record-id]");
+      if (button) openRecord(Number(button.dataset.recordId));
+    });
+    $("#record-dialog").addEventListener("click", (event) => {
+      if (event.target === $("#record-dialog") || event.target.closest("[data-close]")) {
+        $("#record-dialog").close();
+      }
+    });
+
+    renderOverview();
+    populateTowns();
+    renderTable();
+  </script>
+  <style>
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+  </style>
+</body>
+</html>
