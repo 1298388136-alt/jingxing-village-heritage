@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f2f0e8">
+  <title>井陉传统村落 · 保护利用知识图谱</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ground: #f2f0e8;
+      --paper: #fffefa;
+      --ink: #293b33;
+      --muted: #788075;
+      --line: #e5e2d8;
+      --green: #536f58;
+      --green-dark: #354b3e;
+      --vermilion: #a4523d;
+      --gold: #a78245;
+      --blue: #617c89;
+      --purple: #86709a;
+      --shadow: 0 12px 32px rgba(38, 50, 41, .08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(ellipse at 57% 25%, rgba(197, 190, 165, .13), transparent 45%),
+        var(--ground);
+      color: var(--ink);
+      font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", sans-serif;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    button, input, select { font: inherit; }
+    button { color: inherit; }
+    .masthead { border-bottom: 1px solid var(--line); background: rgba(255,254,250,.76); }
+    .masthead-inner, main, .footer-inner { width: min(1500px, calc(100% - 48px)); margin: auto; }
+    .masthead-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 72px; }
+    .brand { display: flex; align-items: center; gap: 13px; }
+    .seal { display: grid; width: 36px; height: 36px; place-items: center; border: 1px solid rgba(164,82,61,.6); color: var(--vermilion); font-family: "STSong", "SimSun", serif; font-size: 19px; }
+    .brand-name { font-family: "STSong", "SimSun", serif; font-size: 16px; letter-spacing: .08em; }
+    .brand-subtitle { margin-top: 1px; color: var(--muted); font-size: 10px; letter-spacing: .12em; }
+    .masthead-meta { color: var(--muted); font-size: 11px; letter-spacing: .1em; }
+    main { padding: 26px 0 34px; }
+    .intro { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin-bottom: 19px; }
+    .eyebrow { color: var(--vermilion); font-size: 10px; letter-spacing: .2em; }
+    h1 { margin: 5px 0 4px; font-family: "STSong", "SimSun", serif; font-size: clamp(25px,3.2vw,35px); font-weight: 500; letter-spacing: .07em; }
+    .intro-copy { max-width: 680px; margin: 0; color: var(--muted); font-size: 12px; }
+    .stats { display: flex; gap: 8px; flex: 0 0 auto; }
+    .stat { min-width: 84px; padding: 7px 11px; border-left: 1px solid #d8d5c9; }
+    .stat strong { display: block; font-family: "STSong", "SimSun", serif; font-size: 19px; font-weight: 500; }
+    .stat span { display: block; color: var(--muted); font-size: 10px; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+    .search-wrap { position: relative; flex: 1 1 270px; max-width: 480px; }
+    .search-icon { position: absolute; top: 50%; left: 12px; color: var(--muted); transform: translateY(-50%); }
+    input, select, .tool-button {
+      height: 38px;
+      border: 1px solid #deded3;
+      border-radius: 3px;
+      outline: none;
+      background: var(--paper);
+    }
+    input { width: 100%; padding: 0 12px 0 32px; }
+    select { min-width: 132px; padding: 0 28px 0 10px; color: var(--ink); }
+    input:focus, select:focus { border-color: #819481; box-shadow: 0 0 0 3px rgba(83,111,88,.1); }
+    .tool-button { padding: 0 12px; color: var(--green-dark); cursor: pointer; transition: background .15s; }
+    .tool-button:hover { background: #eef1e9; }
+    .search-count { margin-left: auto; color: var(--muted); font-size: 11px; }
+    .search-count strong { color: var(--green-dark); }
+    .layout { display: grid; grid-template-columns: 226px minmax(0,1fr) 272px; min-height: min(670px, calc(100vh - 265px)); border: 1px solid #e3e0d6; border-radius: 4px; background: var(--paper); box-shadow: var(--shadow); }
+    .side-panel { min-width: 0; padding: 17px 15px; }
+    .left-panel { border-right: 1px solid var(--line); }
+    .right-panel { border-left: 1px solid var(--line); }
+    .panel-title { margin: 0 0 11px; color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: .14em; }
+    .legend { display: grid; gap: 9px; margin: 0; padding: 0; list-style: none; }
+    .legend-item { display: flex; align-items: center; gap: 9px; color: #505d52; font-size: 11px; }
+    .legend-dot { width: 9px; height: 9px; flex: 0 0 auto; border: 1px solid rgba(0,0,0,.08); border-radius: 50%; }
+    .group-divider { height: 1px; margin: 16px 0; background: var(--line); }
+    .method-note { margin: 0; color: var(--muted); font-size: 10px; line-height: 1.8; }
+    .graph-wrap { position: relative; min-width: 0; min-height: 420px; overflow: hidden; background-color: #fcfbf7; background-image: radial-gradient(#dedbd0 0.7px, transparent 0.7px); background-size: 20px 20px; }
+    canvas { display: block; width: 100%; height: 100%; min-height: 420px; touch-action: none; cursor: grab; }
+    canvas.dragging { cursor: grabbing; }
+    .graph-tip { position: absolute; bottom: 11px; left: 13px; padding: 4px 8px; border: 1px solid rgba(223,220,210,.85); border-radius: 2px; background: rgba(255,254,250,.88); color: var(--muted); font-size: 10px; pointer-events: none; }
+    .selection-hint { color: var(--muted); font-size: 11px; }
+    .record-type { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); font-size: 10px; letter-spacing: .08em; }
+    .record-type .legend-dot { width: 8px; height: 8px; }
+    .record-name { margin: 8px 0 5px; font-family: "STSong", "SimSun", serif; font-size: 21px; font-weight: 500; line-height: 1.4; overflow-wrap: anywhere; }
+    .record-summary { margin: 0 0 13px; color: #606c60; font-size: 11px; }
+    .record-facts { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 0 0 13px; }
+    .fact { padding: 8px; background: #f4f3ed; }
+    .fact span { display: block; color: var(--muted); font-size: 10px; }
+    .fact strong { display: block; margin-top: 2px; font-size: 13px; font-weight: 500; }
+    .connected-heading { margin: 14px 0 7px; color: var(--muted); font-size: 10px; letter-spacing: .1em; }
+    .connection-list { display: flex; flex-wrap: wrap; gap: 5px; max-height: 260px; overflow-y: auto; }
+    .connection-chip { max-width: 100%; padding: 3px 7px; overflow: hidden; border: 1px solid var(--line); border-radius: 2px; background: #fffefa; color: #50624f; font-size: 10px; text-align: left; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+    .connection-chip:hover { border-color: #a4b09d; background: #f1f4ec; }
+    .source-line { margin-top: 13px; padding-top: 10px; border-top: 1px solid var(--line); color: #8a9084; font-size: 9px; line-height: 1.65; }
+    .footer { border-top: 1px solid var(--line); color: #868d81; font-size: 10px; }
+    .footer-inner { display: flex; justify-content: space-between; gap: 16px; padding: 13px 0 20px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    @media (max-width: 1020px) {
+      .layout { grid-template-columns: 190px minmax(0,1fr); }
+      .right-panel { grid-column: 1 / -1; border-top: 1px solid var(--line); border-left: 0; }
+      .right-panel .detail-content { display: grid; grid-template-columns: minmax(200px,1fr) minmax(200px,2fr); column-gap: 18px; }
+      .right-panel .source-line { grid-column: 1 / -1; }
+      .graph-wrap, canvas { min-height: 540px; }
+    }
+    @media (max-width: 660px) {
+      .masthead-inner, main, .footer-inner { width: calc(100% - 26px); }
+      .masthead-inner { min-height: 62px; }
+      .masthead-meta { max-width: 145px; font-size: 9px; text-align: right; }
+      .brand-name { font-size: 14px; }
+      .intro { display: block; }
+      .stats { margin-top: 14px; }
+      .stat { flex: 1 1 0; min-width: 0; padding-left: 9px; }
+      .layout { display: flex; flex-direction: column; }
+      .left-panel { border-right: 0; border-bottom: 1px solid var(--line); }
+      .legend { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .legend-item { font-size: 10px; }
+      .left-panel .group-divider, .left-panel .method-note { display: none; }
+      .graph-wrap, canvas { min-height: 490px; }
+      .right-panel { border-top: 1px solid var(--line); }
+      .right-panel .detail-content { display: block; }
+      select { flex: 1 1 42%; min-width: 0; }
+      .search-count { flex: 1 1 100%; margin: 0; }
+      .footer-inner { flex-direction: column; gap: 4px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="masthead">
+    <div class="masthead-inner">
+      <div class="brand">
+        <span class="seal" aria-hidden="true">陉</span>
+        <div>
+          <div class="brand-name">井陉 · 古村留痕</div>
+          <div class="brand-subtitle">传统村落保护利用知识图谱</div>
+        </div>
+      </div>
+      <div class="masthead-meta">集中连片保护利用规划 · 2022—2035</div>
+    </div>
+  </header>
+  <main>
+    <section class="intro">
+      <div>
+        <div class="eyebrow">HERITAGE KNOWLEDGE MAP</div>
+        <h1>村落、遗产与保护脉络</h1>
+        <p class="intro-copy">以规划报告中的村落名录为基础，串联乡镇、村落、文物古迹、非遗、选址风貌和保护利用布局。选择图谱节点，查看出处与关联。</p>
+      </div>
+      <div class="stats" aria-label="图谱统计">
+        <div class="stat"><strong id="stat-villages">—</strong><span>核心区村落</span></div>
+        <div class="stat"><strong id="stat-nodes">—</strong><span>图谱节点</span></div>
+        <div class="stat"><strong id="stat-links">—</strong><span>关联关系</span></div>
+      </div>
+    </section>
+    <section class="toolbar" aria-label="图谱搜索及筛选">
+      <label class="search-wrap">
+        <span class="search-icon" aria-hidden="true">⌕</span>
+        <span class="sr-only">搜索知识图谱</span>
+        <input id="search" type="search" placeholder="搜索村名、乡镇、遗产项目或规划主题…" autocomplete="off">
+      </label>
+      <label>
+        <span class="sr-only">筛选节点类别</span>
+        <select id="type-filter" aria-label="筛选节点类别"><option value="">全部节点类别</option></select>
+      </label>
+      <button class="tool-button" id="reset-view" type="button">重置视图</button>
+      <button class="tool-button" id="download-data" type="button">导出图谱数据</button>
+      <div class="search-count" id="search-count" aria-live="polite"></div>
+    </section>
+    <section class="layout" aria-label="交互式知识图谱">
+      <aside class="side-panel left-panel">
+        <h2 class="panel-title">图谱图例</h2>
+        <ul class="legend" id="legend"></ul>
+        <div class="group-divider"></div>
+        <h2 class="panel-title">阅读说明</h2>
+        <p class="method-note">节点代表规划中的地点、遗产与主题；连线说明报告记录的隶属、分布、包含或规划关联。滚轮缩放，拖动画布，点击节点查看关联。<br><br>详细人口、文物及非遗数量取自报告表2-4至表2-6。</p>
+      </aside>
+      <div class="graph-wrap" id="graph-wrap">
+        <canvas id="graph" aria-label="传统村落保护利用知识关系图"></canvas>
+        <div class="graph-tip">滚轮缩放 · 拖动平移 · 点击节点聚焦</div>
+      </div>
+      <aside class="side-panel right-panel" aria-live="polite">
+        <h2 class="panel-title">节点档案</h2>
+        <div id="detail-content" class="detail-content">
+          <div class="selection-hint">请选择图谱中的节点，查看来源信息与关联条目。</div>
+        </div>
+      </aside>
+    </section>
+  </main>
+  <footer class="footer"><div class="footer-inner"><span>数据源：井陉县《传统村落集中连片保护利用规划（2022—2035年）》总报告</span><span>离线交互页面 · 报告中信息的结构化整理，不替代原规划文本</span></div></footer>
+  <script>
+    const GRAPH = {"nodes":[{"id":"county","type":"county","label":"井陉县","description":"石家庄市下辖县。规划统筹全县44个中国传统村落，其中集中连片核心区26个。","source":"规划总报告第3—5页、第25—27页。"},{"id":"core","type":"area","label":"26个传统村落集中连片区","description":"规划重点研究的传统村落核心片区，关联村落人口、文物古迹、非遗及保护利用布局。","source":"规划总报告第13—14页，表2-4、表2-5、表2-6。"},{"id":"layout:one-ring-five-boards","type":"layout","label":"一环路、五板块","description":"依托天路环线和公路系统串联传统村落、文保单位与风景名胜区，构建县域保护发展结构。","keywords":"天路环线 全域旅游 大苍岩山 古城古村 县城民俗 冶河山泉 大仙台山","source":"规划总报告第25页。"},{"id":"layout:one-core-many-points","type":"layout","label":"一核多点、两带三区","description":"依托于家及周边打造核心景区；以秦皇古驿道、太行天路形成两条旅游带，并布局北、中、南部三个功能片区。","keywords":"于家村 大梁江 吕家 宋古城 南横口 南障城 北部 中部 南部","source":"规划总报告第31—33页。"},{"id":"layout:landscape-corridors","type":"layout","label":"三条整体景观廊道","description":"规划构建天长镇段、于家乡段、南障城段三条景观廊道，保护山体、植被、河道及村落整体风貌。","keywords":"天长镇段 于家乡段 南障城段 山体 植被 古驿道","source":"规划总报告第29页。"},{"id":"layout:collective-development","type":"layout","label":"连片协同与乡村振兴","description":"通过产业链延伸、业态创新、产权改革和人才引进，以文化促进产业，增强村庄内生发展动力。","keywords":"产业链 业态创新 产权改革 人才引进 可持续发展","source":"规划总报告第31页。"},{"id":"theme:protection-first","type":"theme","label":"保护优先、活态传承","description":"保护文化遗产及其环境，延续传统村落风貌，在保护基础上合理利用。","keywords":"文物保护 历史文化 传统风貌 非遗 活态传承","source":"规划总报告第4页、第29—30页。"},{"id":"theme:people-centered","type":"theme","label":"以人为本、改善生活","description":"尊重村民意愿与主体地位，在保护前提下改善生产生活条件，使发展成果惠及村民。","keywords":"村民 宜居改造 生活设施 公共服务","source":"规划总报告第4页、第51—54页。"},{"id":"theme:classified-guidance","type":"theme","label":"分类引导、一村一品","description":"结合各村环境、文化、风貌及资源禀赋分类施策，彰显地方特色。","keywords":"因地制宜 特色资源 传统村落分类","source":"规划总报告第25—27页。"},{"id":"theme:integrated-conservation","type":"theme","label":"山水格局与整体风貌保护","description":"统筹自然山水、村落格局、传统建筑、古街巷和非物质文化遗产，保护整体遗产环境。","keywords":"山体 河道 植被 古街巷 建筑格局 景观廊道","source":"规划总报告第29—30页。"},{"id":"theme:living-heritage","type":"theme","label":"非遗活态传承","description":"推动传统表演、民间艺术和传统技艺展示传播，培养非遗传承人。","keywords":"传统技艺 民间艺术 戏曲 社火 传承人","source":"规划总报告第30页。"},{"id":"theme:modern-living","type":"theme","label":"传统建筑修缮与宜居改造","description":"坚持保护历史原状，在延续传统风貌的前提下改善建筑功能与生活设施。","keywords":"修旧如故 传统民居 基础设施 生活便利","source":"规划总报告第50—53页。"},{"id":"town:秀林镇","type":"town","label":"秀林镇","description":"集中连片区传统村落所属乡镇（乡）。","source":"来源：规划总报告第13页表2-4、表2-5，第14页表2-6。"},{"id":"town:于家乡","type":"town","label":"于家乡","description":"集中连片区传统村落所属乡镇（乡）。","source":"来源：规划总报告第13页表2-4、表2-5，第14页表2-6。"},{"id":"town:南障城镇","type":"town","label":"南障城镇","description":"集中连片区传统村落所属乡镇（乡）。","source":"来源：规划总报告第13页表2-4、表2-5，第14页表2-6。"},{"id":"town:天长镇","type":"town","label":"天长镇","description":"集中连片区传统村落所属乡镇（乡）。","source":"来源：规划总报告第13页表2-4、表2-5，第14页表2-6。"},{"id":"village:1","type":"village","label":"南横口村","description":"人口与遗产数据按规划现状统计表登记。","facts":{"town":"秀林镇","registered":1338,"resident":820,"hollow":0.61,"historic":11,"general":11,"provincialRelicCount":0,"nationalRelicCount":1,"county":0,"city":0,"provincial":1,"national":0,"heritageTotal":1},"keywords":"秀林镇 南横口村  井陉窑遗址   井陉窑传统烧制技艺 ","source":"来源：规划总报告第13页表2-4、表2-5，第14页表2-6。"},{"id":"village:2","type":"village","label":"于家村","description":"人口与遗产数据按规划现状统计表登记。","facts":{"town":"于家乡","registered":1450,"resident":510,"hollow":0.35,"historic":261,"general":20,"provincialRelicCount":1,"nationalRelicCount":0,"county":0,"city":0,"provincial":1,"national":0,"heritageTotal":1},"keywords":"于家乡 于家村 于家村古村落    于家石头建筑技艺 ","source":"来源：规划总报告第13页表2-4、表2-5，第14页表2-6。"},{"id":"village:3","type":"village","label":"南张井村","description":"人口与遗产数据按规划现状统计表登记。","facts":{"town":"于家乡","registered":600,"resident":200,"hollow":0.33,"historic":0,"general":3,"provincialRelicCount":0,"nationalRelicCount":0,"county":0,"city":0,"provincial":1,"national":1,"heritageTotal":2},"keywords":"于家乡 南张井村     南张井干礤石墙技艺 南张井老虎火","source":"来源：规划总报告第13页表2-4、表2-5，第14页表2-6。"},{"id":"village:4","type":"village","label":"张家村","description":"人口与遗产数据按规划现状统计表登记。","facts":{"town":"于家乡","registered":352,"resident":150,"hollow":0.43,"historic":0,"general":6,"provincialRelicCount":0,"nationalRelicCount":0,"county":0,"city":0,"provincial":0,"national":0,"heritageTotal":0},"keywords":"于家乡 张家村      ","source":"来源：规划总报告第13页表2-4、表2-5，第14页表2-6。"},{"id":"village:5","type":"village","label":"狼窝村","description":"人口与遗产数据按规划现状统计表登记。","facts":{"town":"于家乡","registered":1570,"resident":600,"hollow":0.38,"historic":0,"general":3,"provincialRelicCount":0,"nationalRelicCount":0,"county":0,"city":0,"provincial":0,"national":0,"heritageTotal":0},"keywords":"于家乡 狼窝村      ","source":"来源：规划总报告第13页表2-4、表2-5，第14页表2-6。"},{"id":"village:6","type":"village","label":"高家坡村","description":"人口与遗产数据按规划现状统计表登记。","facts":{"town":"于家乡","registered":760,"resident":380,"hollow":0.5,"historic":0,"general":11,"provincialRelicCount":0,"nationalRelicCount":0,"county":2,"city":1,"provincial":0,"national":0,"heritageTotal":3},"keywords":"于家乡 高家坡村   井陉扎笤帚技艺、井陉枣酒酿造技艺 石家庄丝弦（高家坡丝弦）  ","source":"来源：规划总报告第13页表2-4、表2-5，第14页表2-6。"},{"id":"village:7","type":"village","label":"水窑洼村","description":"人口与遗产数据按规划现状统计表登记。","facts":{"town":"于家乡","registered":180,"resident":60,"hollow":0.33,"historic":0,"general":3,"provincialRelicCount":0,"nationalRelicCount":0,"county":0,"city":0,"provincial":0,"national":0,"heritageTotal":0},"keywords":"于家乡 水窑洼村      ","source":"来源：规划总报告第13页表2-4、表2-5，第14页表2-6。"},{"id":"village:8","type":"village","label":"当泉村","description":"人口与遗产数据按规划现状统计表登记。","facts":{"town":"于家乡","registered":713,"resident":265,"hollow":0.37,"historic":0,"general":7,"provincialRelicCount":0,"nationalRelicCount":0,"county":0,"city":0,"provincial":0,"national":0,"heritageTotal":0},"keywords":"于家乡 当泉村      ","source":"来源：规划总报告第13页表2-4、表2-5，第14页表2-6。"},{"id":"village:9","type":"village","label":"大梁江村","description":"人口与遗产数据按规划现状统计表登记。","facts":{"town":"南障城镇","registered":945,"resident":240,"hollow":0.25,"historic":145,"general":27,"provincialRelicCount":0,"nationalRelicCount":0,"county":0,"city":1,"provincial":0,"national":0,"heritageTotal":1},"keywords":"南障城镇 大梁江村    大梁江开锁儿  ","source":"来源：规划总报告第13页表2-4、表2-5，第14页表2-6。"},{"id":"village:10","type":"village","label":"吕家村","description":"人口与遗产数据按规划现状统计表登记。","facts":{"town":"南障城镇","registered":393,"resident":106,"hollow":0.27,"historic":35,"general":2,"provincialRelicCount":0,"nationalRelicCount":0,"county":0,"city":1,"provincial":0,"national":0,"heritageTotal":1},"keywords":"南障城镇 吕家村    吕氏古法榨油技艺  ","source":"来源：规划总报告第13页表2-4、表2-5，第14页表2-6。"},{"id":"village:11","type":"village","label":"七狮村","description":"人口与遗产数据按规划现状统计表登记。","facts":{"town":"南障城镇","registered":618,"resident":240,"hollow":0.39,"historic":0,"general":2,"provincialRelicCount":1,"nationalRelicCount":0,"county":0,"city":0,"provincial":0,"national":0,"heritageTotal":0},"keywords":"南障城镇 七狮村 千佛崖石窟     ","source":"来源：规划总报告第13页表2-4、表2-5，第14页表2-6。"},{"id":"village:12","type":"village","label":"小梁江村","description":"人口与遗产数据按规划现状统计表登记。","facts":{"town":"南障城镇","registered":440,"resident":180,"hollow":0.41,"historic":0,"general":2,"provincialRelicCount":0,"nationalRelicCount":0,"county":0,"city":0,"provincial":0,"national":0,"heritageTotal":0},"keywords":"南障城镇 小梁江村      ","source":"来源：规划总报告第13页表2-4、表2-5，第14页表2-6。"},{"id":"village:13","type":"village","label":"大王帮村","description":"人口与遗产数据按规划现状统计表登记。","facts":{"town":"南障城镇","registered":625,"resident":200,"hollow":0.32,"historic":0,"general":0,"provincialRelicCount":0,"nationalRelicCount":0,"county":0,"city":0,"provincial":0,"national":0,"heritageTotal":0},"keywords":"南障城镇 大王帮村      ","source":"来源：规划总报告第13页表2-4、表2-5，第14页表2-6。"},{"id":"village:14","type":"village","label":"梁家村","description":"人口与遗产数据按规划现状统计表登记。","facts":{"town":"天长镇","registered":453,"resident":220,"hollow":0.49,"historic":0,"general":7,"provincialRelicCount":0,"nationalRelicCount":0,"county":0,"city":0,"provincial":1,"national":0,"heritageTotal":1},"keywords":"天长镇 梁家村     梁家鹦垴拳 ","source":"来源：规划总报告第13页表2-4、表2-5，第14页表2-6。"},{"id":"village:15","type":"village","label":"宋古城村","description":"人口与遗产数据按规划现状统计表登记。","facts":{"town":"天长镇","registered":453,"resident":220,"hollow":0.49,"historic":98,"general":3,"provincialRelicCount":1,"nationalRelicCount":3,"county":0,"city":0,"provincial":0,"national":0,"heritageTotal":0},"keywords":"天长镇 宋古城村 井陉日伪驻军旧址 井陉窑遗址、井陉古驿道、旧城城墙    ","source":"来源：规划总报告第13页表2-4、表2-5，第14页表2-6。"},{"id":"village:16","type":"village","label":"小龙窝村","description":"人口与遗产数据按规划现状统计表登记。","facts":{"town":"天长镇","registered":700,"resident":300,"hollow":0.43,"historic":70,"general":12,"provincialRelicCount":1,"nationalRelicCount":1,"county":0,"city":0,"provincial":0,"national":0,"heritageTotal":0},"keywords":"天长镇 小龙窝村 龙窝寺石窟 井陉古驿道    ","source":"来源：规划总报告第13页表2-4、表2-5，第14页表2-6。"},{"id":"village:17","type":"village","label":"核桃园村","description":"人口与遗产数据按规划现状统计表登记。","facts":{"town":"天长镇","registered":2230,"resident":1300,"hollow":0.58,"historic":0,"general":18,"provincialRelicCount":0,"nationalRelicCount":1,"county":0,"city":3,"provincial":1,"national":0,"heritageTotal":4},"keywords":"天长镇 核桃园村  井陉古驿道  核桃园扇令官、核桃园拖刀面制作技艺、井陉红脸社火 核桃园打树花 ","source":"来源：规划总报告第13页表2-4、表2-5，第14页表2-6。"},{"id":"village:18","type":"village","label":"长生口村","description":"人口与遗产数据按规划现状统计表登记。","facts":{"town":"天长镇","registered":1150,"resident":460,"hollow":0.4,"historic":0,"general":12,"provincialRelicCount":0,"nationalRelicCount":1,"county":1,"city":0,"provincial":0,"national":0,"heritageTotal":1},"keywords":"天长镇 长生口村  井陉古驿道 井陉刺绣   ","source":"来源：规划总报告第13页表2-4、表2-5，第14页表2-6。"},{"id":"village:19","type":"village","label":"吴家垴村","description":"人口与遗产数据按规划现状统计表登记。","facts":{"town":"天长镇","registered":410,"resident":275,"hollow":0.67,"historic":0,"general":4,"provincialRelicCount":0,"nationalRelicCount":0,"county":0,"city":0,"provincial":0,"national":0,"heritageTotal":0},"keywords":"天长镇 吴家垴村      ","source":"来源：规划总报告第13页表2-4、表2-5，第14页表2-6。"},{"id":"village:20","type":"village","label":"庄旺村","description":"人口与遗产数据按规划现状统计表登记。","facts":{"town":"天长镇","registered":896,"resident":398,"hollow":0.44,"historic":0,"general":5,"provincialRelicCount":0,"nationalRelicCount":0,"county":0,"city":0,"provincial":0,"national":0,"heritageTotal":0},"keywords":"天长镇 庄旺村      ","source":"来源：规划总报告第13页表2-4、表2-5，第14页表2-6。"},{"id":"village:21","type":"village","label":"板桥村","description":"人口与遗产数据按规划现状统计表登记。","facts":{"town":"天长镇","registered":1340,"resident":540,"hollow":0.4,"historic":0,"general":4,"provincialRelicCount":0,"nationalRelicCount":1,"county":1,"city":1,"provincial":1,"national":0,"heritageTotal":3},"keywords":"天长镇 板桥村  井陉古驿道 井陉板桥求雨 板桥秦皇古乐 九曲黄河灯 ","source":"来源：规划总报告第13页表2-4、表2-5，第14页表2-6。"},{"id":"village:22","type":"village","label":"石桥头村","description":"人口与遗产数据按规划现状统计表登记。","facts":{"town":"天长镇","registered":890,"resident":500,"hollow":0.56,"historic":0,"general":6,"provincialRelicCount":1,"nationalRelicCount":1,"county":1,"city":0,"provincial":1,"national":0,"heritageTotal":2},"keywords":"天长镇 石桥头村 通济桥 井陉古驿道 石桥头花脸社火  东岳祭典 ","source":"来源：规划总报告第13页表2-4、表2-5，第14页表2-6。"},{"id":"village:23","type":"village","label":"乏驴岭村","description":"人口与遗产数据按规划现状统计表登记。","facts":{"town":"天长镇","registered":405,"resident":180,"hollow":0.44,"historic":0,"general":9,"provincialRelicCount":2,"nationalRelicCount":1,"county":0,"city":0,"provincial":0,"national":0,"heritageTotal":0},"keywords":"天长镇 乏驴岭村 乏驴岭铁桥、井陉日伪驻军旧址 井陉古驿道    ","source":"来源：规划总报告第13页表2-4、表2-5，第14页表2-6。"},{"id":"village:24","type":"village","label":"北关村","description":"人口与遗产数据按规划现状统计表登记。","facts":{"town":"天长镇","registered":2230,"resident":1887,"hollow":0.85,"historic":0,"general":27,"provincialRelicCount":0,"nationalRelicCount":0,"county":0,"city":0,"provincial":0,"national":0,"heritageTotal":0},"keywords":"天长镇 北关村      ","source":"来源：规划总报告第13页表2-4、表2-5，第14页表2-6。"},{"id":"village:25","type":"village","label":"东关村","description":"人口与遗产数据按规划现状统计表登记。","facts":{"town":"天长镇","registered":1172,"resident":680,"hollow":0.58,"historic":0,"general":29,"provincialRelicCount":2,"nationalRelicCount":1,"county":1,"city":0,"provincial":0,"national":0,"heritageTotal":1},"keywords":"天长镇 东关村 天长镇大石桥、唐家垴墓群 井陉窑遗址 东关渔家乐   ","source":"来源：规划总报告第13页表2-4、表2-5，第14页表2-6。"},{"id":"village:26","type":"village","label":"河东村","description":"人口与遗产数据按规划现状统计表登记。","facts":{"town":"天长镇","registered":1668,"resident":1421,"hollow":0.85,"historic":0,"general":4,"provincialRelicCount":0,"nationalRelicCount":2,"county":0,"city":0,"provincial":0,"national":0,"heritageTotal":0},"keywords":"天长镇 河东村  井陉古驿道、井陉窑遗址    ","source":"来源：规划总报告第13页表2-4、表2-5，第14页表2-6。"},{"id":"type:mountain-rising","type":"typology","label":"依山递增式","description":"依山势递增、顺应山形地势的传统村落选址类型。","keywords":"高家坡村 水窑洼村 大王帮村 板桥村","source":"规划总报告第14页表2-7。"},{"id":"type:three-sides","type":"typology","label":"三面环山式","description":"三面环山的传统村落选址类型。","keywords":"核桃园村 长生口村 南张井村 张家村","source":"规划总报告第14页表2-7。"},{"id":"type:four-sides","type":"typology","label":"四面环山式","description":"四面环山的传统村落选址类型。","keywords":"于家村 狼窝村 吕家村 梁家村 小龙窝村","source":"规划总报告第14页表2-7。"},{"id":"type:mountain-water","type":"typology","label":"背山面水式","description":"背靠山体、面向水系的传统村落选址类型。","keywords":"当泉村 大梁江村 七狮村 小梁江村 乏驴岭村 庄旺村","source":"规划总报告第14页表2-7。"},{"id":"type:hills","type":"typology","label":"丘陵地区","description":"分布于丘陵地带的传统村落选址类型。","keywords":"宋古城村 吴家垴村 北关村 东关村 河东村 南横口村 石桥头村","source":"规划总报告第14页表2-7。"},{"id":"relic:国家级文保:井陉窑遗址","type":"relic","label":"井陉窑遗址","description":"规划记录的非物质文化遗产或文物古迹，已与登记村落建立关联。","keywords":"国家级文保 井陉窑遗址","facts":{"level":"国家级文保"},"source":"来源：规划总报告第13页表2-5、第14页表2-6。"},{"id":"intangible:省级非遗:井陉窑传统烧制技艺","type":"intangible","label":"井陉窑传统烧制技艺","description":"规划记录的非物质文化遗产或文物古迹，已与登记村落建立关联。","keywords":"省级非遗 井陉窑传统烧制技艺","facts":{"level":"省级非遗"},"source":"来源：规划总报告第13页表2-5、第14页表2-6。"},{"id":"relic:省级文保:于家村古村落","type":"relic","label":"于家村古村落","description":"规划记录的非物质文化遗产或文物古迹，已与登记村落建立关联。","keywords":"省级文保 于家村古村落","facts":{"level":"省级文保"},"source":"来源：规划总报告第13页表2-5、第14页表2-6。"},{"id":"intangible:省级非遗:于家石头建筑技艺","type":"intangible","label":"于家石头建筑技艺","description":"规划记录的非物质文化遗产或文物古迹，已与登记村落建立关联。","keywords":"省级非遗 于家石头建筑技艺","facts":{"level":"省级非遗"},"source":"来源：规划总报告第13页表2-5、第14页表2-6。"},{"id":"intangible:省级非遗:南张井干礤石墙技艺","type":"intangible","label":"南张井干礤石墙技艺","description":"规划记录的非物质文化遗产或文物古迹，已与登记村落建立关联。","keywords":"省级非遗 南张井干礤石墙技艺","facts":{"level":"省级非遗"},"source":"来源：规划总报告第13页表2-5、第14页表2-6。"},{"id":"intangible:国家级非遗:南张井老虎火","type":"intangible","label":"南张井老虎火","description":"规划记录的非物质文化遗产或文物古迹，已与登记村落建立关联。","keywords":"国家级非遗 南张井老虎火","facts":{"level":"国家级非遗"},"source":"来源：规划总报告第13页表2-5、第14页表2-6。"},{"id":"intangible:县级非遗:井陉扎笤帚技艺、井陉枣酒酿造技艺","type":"intangible","label":"井陉扎笤帚技艺、井陉枣酒酿造技艺","description":"规划记录的非物质文化遗产或文物古迹，已与登记村落建立关联。","keywords":"县级非遗 井陉扎笤帚技艺、井陉枣酒酿造技艺","facts":{"level":"县级非遗"},"source":"来源：规划总报告第13页表2-5、第14页表2-6。"},{"id":"intangible:市级非遗:石家庄丝弦（高家坡丝弦）","type":"intangible","label":"石家庄丝弦（高家坡丝弦）","description":"规划记录的非物质文化遗产或文物古迹，已与登记村落建立关联。","keywords":"市级非遗 石家庄丝弦（高家坡丝弦）","facts":{"level":"市级非遗"},"source":"来源：规划总报告第13页表2-5、第14页表2-6。"},{"id":"intangible:市级非遗:大梁江开锁儿","type":"intangible","label":"大梁江开锁儿","description":"规划记录的非物质文化遗产或文物古迹，已与登记村落建立关联。","keywords":"市级非遗 大梁江开锁儿","facts":{"level":"市级非遗"},"source":"来源：规划总报告第13页表2-5、第14页表2-6。"},{"id":"intangible:市级非遗:吕氏古法榨油技艺","type":"intangible","label":"吕氏古法榨油技艺","description":"规划记录的非物质文化遗产或文物古迹，已与登记村落建立关联。","keywords":"市级非遗 吕氏古法榨油技艺","facts":{"level":"市级非遗"},"source":"来源：规划总报告第13页表2-5、第14页表2-6。"},{"id":"relic:省级文保:千佛崖石窟","type":"relic","label":"千佛崖石窟","description":"规划记录的非物质文化遗产或文物古迹，已与登记村落建立关联。","keywords":"省级文保 千佛崖石窟","facts":{"level":"省级文保"},"source":"来源：规划总报告第13页表2-5、第14页表2-6。"},{"id":"intangible:省级非遗:梁家鹦垴拳","type":"intangible","label":"梁家鹦垴拳","description":"规划记录的非物质文化遗产或文物古迹，已与登记村落建立关联。","keywords":"省级非遗 梁家鹦垴拳","facts":{"level":"省级非遗"},"source":"来源：规划总报告第13页表2-5、第14页表2-6。"},{"id":"relic:省级文保:井陉日伪驻军旧址","type":"relic","label":"井陉日伪驻军旧址","description":"规划记录的非物质文化遗产或文物古迹，已与登记村落建立关联。","keywords":"省级文保 井陉日伪驻军旧址","facts":{"level":"省级文保"},"source":"来源：规划总报告第13页表2-5、第14页表2-6。"},{"id":"relic:国家级文保:井陉窑遗址、井陉古驿道、旧城城墙","type":"relic","label":"井陉窑遗址、井陉古驿道、旧城城墙","description":"规划记录的非物质文化遗产或文物古迹，已与登记村落建立关联。","keywords":"国家级文保 井陉窑遗址、井陉古驿道、旧城城墙","facts":{"level":"国家级文保"},"source":"来源：规划总报告第13页表2-5、第14页表2-6。"},{"id":"relic:省级文保:龙窝寺石窟","type":"relic","label":"龙窝寺石窟","description":"规划记录的非物质文化遗产或文物古迹，已与登记村落建立关联。","keywords":"省级文保 龙窝寺石窟","facts":{"level":"省级文保"},"source":"来源：规划总报告第13页表2-5、第14页表2-6。"},{"id":"relic:国家级文保:井陉古驿道","type":"relic","label":"井陉古驿道","description":"规划记录的非物质文化遗产或文物古迹，已与登记村落建立关联。","keywords":"国家级文保 井陉古驿道","facts":{"level":"国家级文保"},"source":"来源：规划总报告第13页表2-5、第14页表2-6。"},{"id":"intangible:市级非遗:核桃园扇令官、核桃园拖刀面制作技艺、井陉红脸社火","type":"intangible","label":"核桃园扇令官、核桃园拖刀面制作技艺、井陉红脸社火","description":"规划记录的非物质文化遗产或文物古迹，已与登记村落建立关联。","keywords":"市级非遗 核桃园扇令官、核桃园拖刀面制作技艺、井陉红脸社火","facts":{"level":"市级非遗"},"source":"来源：规划总报告第13页表2-5、第14页表2-6。"},{"id":"intangible:省级非遗:核桃园打树花","type":"intangible","label":"核桃园打树花","description":"规划记录的非物质文化遗产或文物古迹，已与登记村落建立关联。","keywords":"省级非遗 核桃园打树花","facts":{"level":"省级非遗"},"source":"来源：规划总报告第13页表2-5、第14页表2-6。"},{"id":"intangible:县级非遗:井陉刺绣","type":"intangible","label":"井陉刺绣","description":"规划记录的非物质文化遗产或文物古迹，已与登记村落建立关联。","keywords":"县级非遗 井陉刺绣","facts":{"level":"县级非遗"},"source":"来源：规划总报告第13页表2-5、第14页表2-6。"},{"id":"intangible:县级非遗:井陉板桥求雨","type":"intangible","label":"井陉板桥求雨","description":"规划记录的非物质文化遗产或文物古迹，已与登记村落建立关联。","keywords":"县级非遗 井陉板桥求雨","facts":{"level":"县级非遗"},"source":"来源：规划总报告第13页表2-5、第14页表2-6。"},{"id":"intangible:市级非遗:板桥秦皇古乐","type":"intangible","label":"板桥秦皇古乐","description":"规划记录的非物质文化遗产或文物古迹，已与登记村落建立关联。","keywords":"市级非遗 板桥秦皇古乐","facts":{"level":"市级非遗"},"source":"来源：规划总报告第13页表2-5、第14页表2-6。"},{"id":"intangible:省级非遗:九曲黄河灯","type":"intangible","label":"九曲黄河灯","description":"规划记录的非物质文化遗产或文物古迹，已与登记村落建立关联。","keywords":"省级非遗 九曲黄河灯","facts":{"level":"省级非遗"},"source":"来源：规划总报告第13页表2-5、第14页表2-6。"},{"id":"relic:省级文保:通济桥","type":"relic","label":"通济桥","description":"规划记录的非物质文化遗产或文物古迹，已与登记村落建立关联。","keywords":"省级文保 通济桥","facts":{"level":"省级文保"},"source":"来源：规划总报告第13页表2-5、第14页表2-6。"},{"id":"intangible:县级非遗:石桥头花脸社火","type":"intangible","label":"石桥头花脸社火","description":"规划记录的非物质文化遗产或文物古迹，已与登记村落建立关联。","keywords":"县级非遗 石桥头花脸社火","facts":{"level":"县级非遗"},"source":"来源：规划总报告第13页表2-5、第14页表2-6。"},{"id":"intangible:省级非遗:东岳祭典","type":"intangible","label":"东岳祭典","description":"规划记录的非物质文化遗产或文物古迹，已与登记村落建立关联。","keywords":"省级非遗 东岳祭典","facts":{"level":"省级非遗"},"source":"来源：规划总报告第13页表2-5、第14页表2-6。"},{"id":"relic:省级文保:乏驴岭铁桥、井陉日伪驻军旧址","type":"relic","label":"乏驴岭铁桥、井陉日伪驻军旧址","description":"规划记录的非物质文化遗产或文物古迹，已与登记村落建立关联。","keywords":"省级文保 乏驴岭铁桥、井陉日伪驻军旧址","facts":{"level":"省级文保"},"source":"来源：规划总报告第13页表2-5、第14页表2-6。"},{"id":"relic:省级文保:天长镇大石桥、唐家垴墓群","type":"relic","label":"天长镇大石桥、唐家垴墓群","description":"规划记录的非物质文化遗产或文物古迹，已与登记村落建立关联。","keywords":"省级文保 天长镇大石桥、唐家垴墓群","facts":{"level":"省级文保"},"source":"来源：规划总报告第13页表2-5、第14页表2-6。"},{"id":"intangible:县级非遗:东关渔家乐","type":"intangible","label":"东关渔家乐","description":"规划记录的非物质文化遗产或文物古迹，已与登记村落建立关联。","keywords":"县级非遗 东关渔家乐","facts":{"level":"县级非遗"},"source":"来源：规划总报告第13页表2-5、第14页表2-6。"},{"id":"relic:国家级文保:井陉古驿道、井陉窑遗址","type":"relic","label":"井陉古驿道、井陉窑遗址","description":"规划记录的非物质文化遗产或文物古迹，已与登记村落建立关联。","keywords":"国家级文保 井陉古驿道、井陉窑遗址","facts":{"level":"国家级文保"},"source":"来源：规划总报告第13页表2-5、第14页表2-6。"},{"id":"corridor:qinhuang","type":"layout","label":"秦皇古驿道文化旅游带","description":"以秦皇古驿道及绵右渠精神为主题，连接古城古村和沿线节点。","keywords":"宋古城村 北关村 东关村 河东村 核桃园村 小龙窝村 石桥头村 板桥村 长生口村 乏驴岭村","source":"Planning report, page 31."},{"id":"corridor:tianlu","type":"layout","label":"太行天路民俗风情旅游带","description":"依托太行天路，联动陶瓷、廉洁文化、石建筑与民俗体验节点。","keywords":"南横口村 于家村 南张井村 张家村 狼窝村 高家坡村 水窑洼村 当泉村 大梁江村 吕家村 小梁江村","source":"Planning report, page 31."},{"id":"corridor:tianshang","type":"layout","label":"天长镇段景观廊道","description":"以宋古城为中心，联系沿线古村与山水景观。","keywords":"宋古城村 石桥头村 庄旺村 南横口村 乏驴岭村 板桥村 梁家村 长生口村 小龙窝村 核桃园村","source":"Planning report, page 29."},{"id":"corridor:yujia","type":"layout","label":"于家乡段景观廊道","description":"以于家村为中心，联系乡域传统村落及周边山地景观。","keywords":"于家村 南张井村 张家村 当泉村 高家坡村 狼窝村 水窑洼村","source":"Planning report, page 29."},{"id":"corridor:nanzhangcheng","type":"layout","label":"南障城段景观廊道","description":"以吕家为组织节点，保护道路两侧山体与自然景观。","keywords":"吕家村 大梁江村 七狮村 小梁江村","source":"Planning report, page 29."},{"id":"group:songgucheng","type":"layout","label":"宋古城发展组团","description":"宋古城发展组团","keywords":"宋古城村 东关村 北关村 河东村","source":"Planning report, page 31."},{"id":"group:qinghuang","type":"layout","label":"秦皇古驿道入口组团","description":"秦皇古驿道入口组团","keywords":"核桃园村 小龙窝村","source":"Planning report, page 31."},{"id":"group:ceramic","type":"layout","label":"国际陶瓷发展组团","description":"国际陶瓷发展组团","keywords":"南横口村","source":"Planning report, page 31."},{"id":"group:yujia","type":"layout","label":"于家旅游组团","description":"于家旅游组团","keywords":"于家村 当泉村 张家村 南张井村","source":"Planning report, page 31."},{"id":"group:stone","type":"layout","label":"传统建筑展示组团","description":"传统建筑展示组团","keywords":"大梁江村 吕家村 小梁江村","source":"Planning report, page 31."},{"id":"group:leisure","type":"layout","label":"乡野休闲组团","description":"乡野休闲组团","keywords":"七狮村","source":"Planning report, page 31."},{"id":"region:north","type":"layout","label":"北部秦皇驿道文化展示区","description":"规划片区含12个传统村落。依托古驿道，以驿道文化、绵右渠精神和古城古村体验为特色。图中仅连接规划文字明确点名的核心区村落。","keywords":"宋古城村 东关村 北关村 河东村 核桃园村 小龙窝村 石桥头村 板桥村 长生口村 乏驴岭村","source":"Planning report, page 31."},{"id":"region:middle","type":"layout","label":"中部天路民俗风情体验区","description":"规划片区含12个传统村落。突出廉洁文化、传统石建筑、陶瓷文化及民俗体验。图中仅连接规划文字明确点名的核心区村落。","keywords":"南横口村 于家村 南张井村 张家村 狼窝村 高家坡村 水窑洼村 当泉村 大梁江村 吕家村 小梁江村","source":"Planning report, page 32."},{"id":"region:south","type":"layout","label":"南部乡野休闲文化游憩区","description":"规划片区含2个传统村落。以南部自然生态与乡野文化为特色，发展休闲游憩体验。图中仅连接规划文字明确点名的核心区村落。","keywords":"七狮村","source":"Planning report, page 33."}],"edges":[{"source":"core","target":"town:秀林镇","label":"涉及乡镇","citation":"Report p. 13"},{"source":"town:秀林镇","target":"county","label":"行政隶属","citation":"Report p. 13"},{"source":"core","target":"town:于家乡","label":"涉及乡镇","citation":"Report p. 13"},{"source":"town:于家乡","target":"county","label":"行政隶属","citation":"Report p. 13"},{"source":"core","target":"town:南障城镇","label":"涉及乡镇","citation":"Report p. 13"},{"source":"town:南障城镇","target":"county","label":"行政隶属","citation":"Report p. 13"},{"source":"core","target":"town:天长镇","label":"涉及乡镇","citation":"Report p. 13"},{"source":"town:天长镇","target":"county","label":"行政隶属","citation":"Report p. 13"},{"source":"core","target":"village:1","label":"包含村落","citation":"Report p. 13"},{"source":"town:秀林镇","target":"village:1","label":"所属乡镇","citation":"Report p. 13"},{"source":"core","target":"village:2","label":"包含村落","citation":"Report p. 13"},{"source":"town:于家乡","target":"village:2","label":"所属乡镇","citation":"Report p. 13"},{"source":"core","target":"village:3","label":"包含村落","citation":"Report p. 13"},{"source":"town:于家乡","target":"village:3","label":"所属乡镇","citation":"Report p. 13"},{"source":"core","target":"village:4","label":"包含村落","citation":"Report p. 13"},{"source":"town:于家乡","target":"village:4","label":"所属乡镇","citation":"Report p. 13"},{"source":"core","target":"village:5","label":"包含村落","citation":"Report p. 13"},{"source":"town:于家乡","target":"village:5","label":"所属乡镇","citation":"Report p. 13"},{"source":"core","target":"village:6","label":"包含村落","citation":"Report p. 13"},{"source":"town:于家乡","target":"village:6","label":"所属乡镇","citation":"Report p. 13"},{"source":"core","target":"village:7","label":"包含村落","citation":"Report p. 13"},{"source":"town:于家乡","target":"village:7","label":"所属乡镇","citation":"Report p. 13"},{"source":"core","target":"village:8","label":"包含村落","citation":"Report p. 13"},{"source":"town:于家乡","target":"village:8","label":"所属乡镇","citation":"Report p. 13"},{"source":"core","target":"village:9","label":"包含村落","citation":"Report p. 13"},{"source":"town:南障城镇","target":"village:9","label":"所属乡镇","citation":"Report p. 13"},{"source":"core","target":"village:10","label":"包含村落","citation":"Report p. 13"},{"source":"town:南障城镇","target":"village:10","label":"所属乡镇","citation":"Report p. 13"},{"source":"core","target":"village:11","label":"包含村落","citation":"Report p. 13"},{"source":"town:南障城镇","target":"village:11","label":"所属乡镇","citation":"Report p. 13"},{"source":"core","target":"village:12","label":"包含村落","citation":"Report p. 13"},{"source":"town:南障城镇","target":"village:12","label":"所属乡镇","citation":"Report p. 13"},{"source":"core","target":"village:13","label":"包含村落","citation":"Report p. 13"},{"source":"town:南障城镇","target":"village:13","label":"所属乡镇","citation":"Report p. 13"},{"source":"core","target":"village:14","label":"包含村落","citation":"Report p. 13"},{"source":"town:天长镇","target":"village:14","label":"所属乡镇","citation":"Report p. 13"},{"source":"core","target":"village:15","label":"包含村落","citation":"Report p. 13"},{"source":"town:天长镇","target":"village:15","label":"所属乡镇","citation":"Report p. 13"},{"source":"core","target":"village:16","label":"包含村落","citation":"Report p. 13"},{"source":"town:天长镇","target":"village:16","label":"所属乡镇","citation":"Report p. 13"},{"source":"core","target":"village:17","label":"包含村落","citation":"Report p. 13"},{"source":"town:天长镇","target":"village:17","label":"所属乡镇","citation":"Report p. 13"},{"source":"core","target":"village:18","label":"包含村落","citation":"Report p. 13"},{"source":"town:天长镇","target":"village:18","label":"所属乡镇","citation":"Report p. 13"},{"source":"core","target":"village:19","label":"包含村落","citation":"Report p. 13"},{"source":"town:天长镇","target":"village:19","label":"所属乡镇","citation":"Report p. 13"},{"source":"core","target":"village:20","label":"包含村落","citation":"Report p. 13"},{"source":"town:天长镇","target":"village:20","label":"所属乡镇","citation":"Report p. 13"},{"source":"core","target":"village:21","label":"包含村落","citation":"Report p. 13"},{"source":"town:天长镇","target":"village:21","label":"所属乡镇","citation":"Report p. 13"},{"source":"core","target":"village:22","label":"包含村落","citation":"Report p. 13"},{"source":"town:天长镇","target":"village:22","label":"所属乡镇","citation":"Report p. 13"},{"source":"core","target":"village:23","label":"包含村落","citation":"Report p. 13"},{"source":"town:天长镇","target":"village:23","label":"所属乡镇","citation":"Report p. 13"},{"source":"core","target":"village:24","label":"包含村落","citation":"Report p. 13"},{"source":"town:天长镇","target":"village:24","label":"所属乡镇","citation":"Report p. 13"},{"source":"core","target":"village:25","label":"包含村落","citation":"Report p. 13"},{"source":"town:天长镇","target":"village:25","label":"所属乡镇","citation":"Report p. 13"},{"source":"core","target":"village:26","label":"包含村落","citation":"Report p. 13"},{"source":"town:天长镇","target":"village:26","label":"所属乡镇","citation":"Report p. 13"},{"source":"type:mountain-rising","target":"village:6","label":"选址类型","citation":"Report p. 14"},{"source":"type:mountain-rising","target":"village:7","label":"选址类型","citation":"Report p. 14"},{"source":"type:mountain-rising","target":"village:13","label":"选址类型","citation":"Report p. 14"},{"source":"type:mountain-rising","target":"village:21","label":"选址类型","citation":"Report p. 14"},{"source":"type:three-sides","target":"village:17","label":"选址类型","citation":"Report p. 14"},{"source":"type:three-sides","target":"village:18","label":"选址类型","citation":"Report p. 14"},{"source":"type:three-sides","target":"village:3","label":"选址类型","citation":"Report p. 14"},{"source":"type:three-sides","target":"village:4","label":"选址类型","citation":"Report p. 14"},{"source":"type:four-sides","target":"village:2","label":"选址类型","citation":"Report p. 14"},{"source":"type:four-sides","target":"village:5","label":"选址类型","citation":"Report p. 14"},{"source":"type:four-sides","target":"village:10","label":"选址类型","citation":"Report p. 14"},{"source":"type:four-sides","target":"village:14","label":"选址类型","citation":"Report p. 14"},{"source":"type:four-sides","target":"village:16","label":"选址类型","citation":"Report p. 14"},{"source":"type:mountain-water","target":"village:8","label":"选址类型","citation":"Report p. 14"},{"source":"type:mountain-water","target":"village:9","label":"选址类型","citation":"Report p. 14"},{"source":"type:mountain-water","target":"village:11","label":"选址类型","citation":"Report p. 14"},{"source":"type:mountain-water","target":"village:12","label":"选址类型","citation":"Report p. 14"},{"source":"type:mountain-water","target":"village:23","label":"选址类型","citation":"Report p. 14"},{"source":"type:mountain-water","target":"village:20","label":"选址类型","citation":"Report p. 14"},{"source":"type:hills","target":"village:15","label":"选址类型","citation":"Report p. 14"},{"source":"type:hills","target":"village:19","label":"选址类型","citation":"Report p. 14"},{"source":"type:hills","target":"village:24","label":"选址类型","citation":"Report p. 14"},{"source":"type:hills","target":"village:25","label":"选址类型","citation":"Report p. 14"},{"source":"type:hills","target":"village:26","label":"选址类型","citation":"Report p. 14"},{"source":"type:hills","target":"village:1","label":"选址类型","citation":"Report p. 14"},{"source":"type:hills","target":"village:22","label":"选址类型","citation":"Report p. 14"},{"source":"village:1","target":"relic:国家级文保:井陉窑遗址","label":"国家级文保","citation":"Report p. 13"},{"source":"village:1","target":"intangible:省级非遗:井陉窑传统烧制技艺","label":"省级非遗","citation":"Report p. 13"},{"source":"village:2","target":"relic:省级文保:于家村古村落","label":"省级文保","citation":"Report p. 13"},{"source":"village:2","target":"intangible:省级非遗:于家石头建筑技艺","label":"省级非遗","citation":"Report p. 13"},{"source":"village:3","target":"intangible:省级非遗:南张井干礤石墙技艺","label":"省级非遗","citation":"Report p. 13"},{"source":"village:3","target":"intangible:国家级非遗:南张井老虎火","label":"国家级非遗","citation":"Report p. 13"},{"source":"village:6","target":"intangible:县级非遗:井陉扎笤帚技艺、井陉枣酒酿造技艺","label":"县级非遗","citation":"Report p. 13"},{"source":"village:6","target":"intangible:市级非遗:石家庄丝弦（高家坡丝弦）","label":"市级非遗","citation":"Report p. 13"},{"source":"village:9","target":"intangible:市级非遗:大梁江开锁儿","label":"市级非遗","citation":"Report p. 13"},{"source":"village:10","target":"intangible:市级非遗:吕氏古法榨油技艺","label":"市级非遗","citation":"Report p. 13"},{"source":"village:11","target":"relic:省级文保:千佛崖石窟","label":"省级文保","citation":"Report p. 13"},{"source":"village:14","target":"intangible:省级非遗:梁家鹦垴拳","label":"省级非遗","citation":"Report p. 13"},{"source":"village:15","target":"relic:省级文保:井陉日伪驻军旧址","label":"省级文保","citation":"Report p. 13"},{"source":"village:15","target":"relic:国家级文保:井陉窑遗址、井陉古驿道、旧城城墙","label":"国家级文保","citation":"Report p. 13"},{"source":"village:16","target":"relic:省级文保:龙窝寺石窟","label":"省级文保","citation":"Report p. 13"},{"source":"village:16","target":"relic:国家级文保:井陉古驿道","label":"国家级文保","citation":"Report p. 13"},{"source":"village:17","target":"relic:国家级文保:井陉古驿道","label":"国家级文保","citation":"Report p. 13"},{"source":"village:17","target":"intangible:市级非遗:核桃园扇令官、核桃园拖刀面制作技艺、井陉红脸社火","label":"市级非遗","citation":"Report p. 13"},{"source":"village:17","target":"intangible:省级非遗:核桃园打树花","label":"省级非遗","citation":"Report p. 13"},{"source":"village:18","target":"relic:国家级文保:井陉古驿道","label":"国家级文保","citation":"Report p. 13"},{"source":"village:18","target":"intangible:县级非遗:井陉刺绣","label":"县级非遗","citation":"Report p. 13"},{"source":"village:21","target":"relic:国家级文保:井陉古驿道","label":"国家级文保","citation":"Report p. 13"},{"source":"village:21","target":"intangible:县级非遗:井陉板桥求雨","label":"县级非遗","citation":"Report p. 13"},{"source":"village:21","target":"intangible:市级非遗:板桥秦皇古乐","label":"市级非遗","citation":"Report p. 13"},{"source":"village:21","target":"intangible:省级非遗:九曲黄河灯","label":"省级非遗","citation":"Report p. 13"},{"source":"village:22","target":"relic:省级文保:通济桥","label":"省级文保","citation":"Report p. 13"},{"source":"village:22","target":"relic:国家级文保:井陉古驿道","label":"国家级文保","citation":"Report p. 13"},{"source":"village:22","target":"intangible:县级非遗:石桥头花脸社火","label":"县级非遗","citation":"Report p. 13"},{"source":"village:22","target":"intangible:省级非遗:东岳祭典","label":"省级非遗","citation":"Report p. 13"},{"source":"village:23","target":"relic:省级文保:乏驴岭铁桥、井陉日伪驻军旧址","label":"省级文保","citation":"Report p. 13"},{"source":"village:23","target":"relic:国家级文保:井陉古驿道","label":"国家级文保","citation":"Report p. 13"},{"source":"village:25","target":"relic:省级文保:天长镇大石桥、唐家垴墓群","label":"省级文保","citation":"Report p. 13"},{"source":"village:25","target":"relic:国家级文保:井陉窑遗址","label":"国家级文保","citation":"Report p. 13"},{"source":"village:25","target":"intangible:县级非遗:东关渔家乐","label":"县级非遗","citation":"Report p. 13"},{"source":"village:26","target":"relic:国家级文保:井陉古驿道、井陉窑遗址","label":"国家级文保","citation":"Report p. 13"},{"source":"county","target":"core","label":"统筹保护","citation":"Report p. 4"},{"source":"county","target":"layout:one-ring-five-boards","label":"县域统筹结构","citation":"Report p. 25"},{"source":"core","target":"layout:one-core-many-points","label":"片区总体布局","citation":"Report p. 31"},{"source":"core","target":"layout:landscape-corridors","label":"整体保护廊道","citation":"Report p. 29"},{"source":"core","target":"layout:collective-development","label":"保护利用目标","citation":"Report p. 31"},{"source":"layout:one-ring-five-boards","target":"core","label":"串联片区","citation":"Report p. 25"},{"source":"county","target":"theme:protection-first","label":"规划原则与策略","citation":"Report p. 4"},{"source":"county","target":"theme:people-centered","label":"规划原则与策略","citation":"Report p. 4"},{"source":"county","target":"theme:classified-guidance","label":"规划原则与策略","citation":"Report p. 4"},{"source":"county","target":"theme:integrated-conservation","label":"规划原则与策略","citation":"Report p. 4"},{"source":"county","target":"theme:living-heritage","label":"规划原则与策略","citation":"Report p. 4"},{"source":"county","target":"theme:modern-living","label":"规划原则与策略","citation":"Report p. 4"},{"source":"layout:landscape-corridors","target":"corridor:qinhuang","label":"景观廊道","citation":"Report p. 29"},{"source":"layout:landscape-corridors","target":"corridor:tianlu","label":"景观廊道","citation":"Report p. 29"},{"source":"layout:landscape-corridors","target":"corridor:tianshang","label":"景观廊道","citation":"Report p. 29"},{"source":"layout:landscape-corridors","target":"corridor:yujia","label":"景观廊道","citation":"Report p. 29"},{"source":"layout:landscape-corridors","target":"corridor:nanzhangcheng","label":"景观廊道","citation":"Report p. 29"},{"source":"layout:one-core-many-points","target":"group:songgucheng","label":"特色发展组团","citation":"Report p. 31"},{"source":"layout:one-core-many-points","target":"group:qinghuang","label":"特色发展组团","citation":"Report p. 31"},{"source":"layout:one-core-many-points","target":"group:ceramic","label":"特色发展组团","citation":"Report p. 31"},{"source":"layout:one-core-many-points","target":"group:yujia","label":"特色发展组团","citation":"Report p. 31"},{"source":"layout:one-core-many-points","target":"group:stone","label":"特色发展组团","citation":"Report p. 31"},{"source":"layout:one-core-many-points","target":"group:leisure","label":"特色发展组团","citation":"Report p. 31"},{"source":"layout:one-core-many-points","target":"region:north","label":"功能片区","citation":"Report p. 31"},{"source":"layout:one-core-many-points","target":"region:middle","label":"功能片区","citation":"Report p. 32"},{"source":"layout:one-core-many-points","target":"region:south","label":"功能片区","citation":"Report p. 33"},{"source":"corridor:qinhuang","target":"village:15","label":"沿线村落","citation":"Report p. 31"},{"source":"corridor:qinhuang","target":"village:24","label":"沿线村落","citation":"Report p. 31"},{"source":"corridor:qinhuang","target":"village:25","label":"沿线村落","citation":"Report p. 31"},{"source":"corridor:qinhuang","target":"village:26","label":"沿线村落","citation":"Report p. 31"},{"source":"corridor:qinhuang","target":"village:17","label":"沿线村落","citation":"Report p. 31"},{"source":"corridor:qinhuang","target":"village:16","label":"沿线村落","citation":"Report p. 31"},{"source":"corridor:qinhuang","target":"village:22","label":"沿线村落","citation":"Report p. 31"},{"source":"corridor:qinhuang","target":"village:21","label":"沿线村落","citation":"Report p. 31"},{"source":"corridor:qinhuang","target":"village:18","label":"沿线村落","citation":"Report p. 31"},{"source":"corridor:qinhuang","target":"village:23","label":"沿线村落","citation":"Report p. 31"},{"source":"corridor:tianlu","target":"village:1","label":"沿线村落","citation":"Report p. 31"},{"source":"corridor:tianlu","target":"village:2","label":"沿线村落","citation":"Report p. 31"},{"source":"corridor:tianlu","target":"village:3","label":"沿线村落","citation":"Report p. 31"},{"source":"corridor:tianlu","target":"village:4","label":"沿线村落","citation":"Report p. 31"},{"source":"corridor:tianlu","target":"village:5","label":"沿线村落","citation":"Report p. 31"},{"source":"corridor:tianlu","target":"village:6","label":"沿线村落","citation":"Report p. 31"},{"source":"corridor:tianlu","target":"village:7","label":"沿线村落","citation":"Report p. 31"},{"source":"corridor:tianlu","target":"village:8","label":"沿线村落","citation":"Report p. 31"},{"source":"corridor:tianlu","target":"village:9","label":"沿线村落","citation":"Report p. 31"},{"source":"corridor:tianlu","target":"village:10","label":"沿线村落","citation":"Report p. 31"},{"source":"corridor:tianlu","target":"village:12","label":"沿线村落","citation":"Report p. 31"},{"source":"corridor:tianshang","target":"village:15","label":"沿线村落","citation":"Report p. 29"},{"source":"corridor:tianshang","target":"village:22","label":"沿线村落","citation":"Report p. 29"},{"source":"corridor:tianshang","target":"village:20","label":"沿线村落","citation":"Report p. 29"},{"source":"corridor:tianshang","target":"village:1","label":"沿线村落","citation":"Report p. 29"},{"source":"corridor:tianshang","target":"village:23","label":"沿线村落","citation":"Report p. 29"},{"source":"corridor:tianshang","target":"village:21","label":"沿线村落","citation":"Report p. 29"},{"source":"corridor:tianshang","target":"village:14","label":"沿线村落","citation":"Report p. 29"},{"source":"corridor:tianshang","target":"village:18","label":"沿线村落","citation":"Report p. 29"},{"source":"corridor:tianshang","target":"village:16","label":"沿线村落","citation":"Report p. 29"},{"source":"corridor:tianshang","target":"village:17","label":"沿线村落","citation":"Report p. 29"},{"source":"corridor:yujia","target":"village:2","label":"沿线村落","citation":"Report p. 29"},{"source":"corridor:yujia","target":"village:3","label":"沿线村落","citation":"Report p. 29"},{"source":"corridor:yujia","target":"village:4","label":"沿线村落","citation":"Report p. 29"},{"source":"corridor:yujia","target":"village:8","label":"沿线村落","citation":"Report p. 29"},{"source":"corridor:yujia","target":"village:6","label":"沿线村落","citation":"Report p. 29"},{"source":"corridor:yujia","target":"village:5","label":"沿线村落","citation":"Report p. 29"},{"source":"corridor:yujia","target":"village:7","label":"沿线村落","citation":"Report p. 29"},{"source":"corridor:nanzhangcheng","target":"village:10","label":"沿线村落","citation":"Report p. 29"},{"source":"corridor:nanzhangcheng","target":"village:9","label":"沿线村落","citation":"Report p. 29"},{"source":"corridor:nanzhangcheng","target":"village:11","label":"沿线村落","citation":"Report p. 29"},{"source":"corridor:nanzhangcheng","target":"village:12","label":"沿线村落","citation":"Report p. 29"},{"source":"group:songgucheng","target":"village:15","label":"组团关联村落","citation":"Report p. 31"},{"source":"group:songgucheng","target":"village:25","label":"组团关联村落","citation":"Report p. 31"},{"source":"group:songgucheng","target":"village:24","label":"组团关联村落","citation":"Report p. 31"},{"source":"group:songgucheng","target":"village:26","label":"组团关联村落","citation":"Report p. 31"},{"source":"group:qinghuang","target":"village:17","label":"组团关联村落","citation":"Report p. 31"},{"source":"group:qinghuang","target":"village:16","label":"组团关联村落","citation":"Report p. 31"},{"source":"group:ceramic","target":"village:1","label":"组团关联村落","citation":"Report p. 31"},{"source":"group:yujia","target":"village:2","label":"组团关联村落","citation":"Report p. 31"},{"source":"group:yujia","target":"village:8","label":"组团关联村落","citation":"Report p. 31"},{"source":"group:yujia","target":"village:4","label":"组团关联村落","citation":"Report p. 31"},{"source":"group:yujia","target":"village:3","label":"组团关联村落","citation":"Report p. 31"},{"source":"group:stone","target":"village:9","label":"组团关联村落","citation":"Report p. 31"},{"source":"group:stone","target":"village:10","label":"组团关联村落","citation":"Report p. 31"},{"source":"group:stone","target":"village:12","label":"组团关联村落","citation":"Report p. 31"},{"source":"group:leisure","target":"village:11","label":"组团关联村落","citation":"Report p. 31"},{"source":"region:north","target":"village:15","label":"片区关联村落","citation":"Report p. 31"},{"source":"region:north","target":"village:25","label":"片区关联村落","citation":"Report p. 31"},{"source":"region:north","target":"village:24","label":"片区关联村落","citation":"Report p. 31"},{"source":"region:north","target":"village:26","label":"片区关联村落","citation":"Report p. 31"},{"source":"region:north","target":"village:17","label":"片区关联村落","citation":"Report p. 31"},{"source":"region:north","target":"village:16","label":"片区关联村落","citation":"Report p. 31"},{"source":"region:north","target":"village:22","label":"片区关联村落","citation":"Report p. 31"},{"source":"region:north","target":"village:21","label":"片区关联村落","citation":"Report p. 31"},{"source":"region:north","target":"village:18","label":"片区关联村落","citation":"Report p. 31"},{"source":"region:north","target":"village:23","label":"片区关联村落","citation":"Report p. 31"},{"source":"region:middle","target":"village:1","label":"片区关联村落","citation":"Report p. 32"},{"source":"region:middle","target":"village:2","label":"片区关联村落","citation":"Report p. 32"},{"source":"region:middle","target":"village:3","label":"片区关联村落","citation":"Report p. 32"},{"source":"region:middle","target":"village:4","label":"片区关联村落","citation":"Report p. 32"},{"source":"region:middle","target":"village:5","label":"片区关联村落","citation":"Report p. 32"},{"source":"region:middle","target":"village:6","label":"片区关联村落","citation":"Report p. 32"},{"source":"region:middle","target":"village:7","label":"片区关联村落","citation":"Report p. 32"},{"source":"region:middle","target":"village:8","label":"片区关联村落","citation":"Report p. 32"},{"source":"region:middle","target":"village:9","label":"片区关联村落","citation":"Report p. 32"},{"source":"region:middle","target":"village:10","label":"片区关联村落","citation":"Report p. 32"},{"source":"region:middle","target":"village:12","label":"片区关联村落","citation":"Report p. 32"},{"source":"region:south","target":"village:11","label":"片区关联村落","citation":"Report p. 33"}],"towns":[{"id":"town:秀林镇","label":"秀林镇"},{"id":"town:于家乡","label":"于家乡"},{"id":"town:南障城镇","label":"南障城镇"},{"id":"town:天长镇","label":"天长镇"}]};
+    const COLORS = {
+      admin: "#536f58",
+      village: "#92713e",
+      relic: "#a4523d",
+      intangible: "#86709a",
+      typology: "#617c89",
+      plan: "#66836c"
+    };
+    const TYPE_NAMES = {
+      county: "县域",
+      area: "保护片区",
+      town: "乡镇",
+      village: "传统村落",
+      relic: "文物古迹",
+      intangible: "非物质文化遗产",
+      typology: "选址风貌",
+      layout: "规划布局",
+      theme: "保护利用策略"
+    };
+    const CATEGORY_FOR_TYPE = {
+      county: "admin", area: "admin", town: "admin",
+      village: "village", relic: "relic", intangible: "intangible",
+      typology: "typology", layout: "plan", theme: "plan"
+    };
+    const nodeMap = new Map(GRAPH.nodes.map((node) => [node.id, node]));
+    const links = GRAPH.edges.filter((edge) => nodeMap.has(edge.source) && nodeMap.has(edge.target));
+    const linksByNode = new Map(GRAPH.nodes.map((node) => [node.id, []]));
+    for (const edge of links) {
+      linksByNode.get(edge.source).push({ node: nodeMap.get(edge.target), label: edge.label });
+      linksByNode.get(edge.target).push({ node: nodeMap.get(edge.source), label: edge.label });
+    }
+    const canvas = document.querySelector("#graph");
+    const context = canvas.getContext("2d");
+    const graphWrap = document.querySelector("#graph-wrap");
+    const state = { width: 0, height: 0, scale: 1, panX: 0, panY: 0, selected: "", hovered: "", drag: null, viewIds: null };
+    const byId = nodeMap;
+    const graphNodes = GRAPH.nodes;
+    const typeCounts = new Map();
+    for (const node of graphNodes) typeCounts.set(node.type, (typeCounts.get(node.type) || 0) + 1);
+
+    function safeNumber(value) {
+      const number = Number(value);
+      return Number.isFinite(number) ? number : 0;
+    }
+
+    function nodeRadius(node) {
+      if (node.type === "county") return 12;
+      if (node.type === "area") return 10;
+      if (node.type === "town") return 8;
+      if (node.type === "village") return 5.6 + Math.min(3, Math.log1p((node.facts?.heritageTotal || 0)) * .8);
+      return node.type === "layout" || node.type === "theme" || node.type === "typology" ? 6.4 : 5;
+    }
+
+    function hash(text) {
+      let value = 2166136261;
+      for (const character of text) value = Math.imul(value ^ character.charCodeAt(0), 16777619);
+      return value >>> 0;
+    }
+
+    function initializePositions() {
+      const centerX = state.width / 2;
+      const centerY = state.height / 2;
+      const townAngle = new Map(GRAPH.towns.map((town, index) => [
+        town.id, -Math.PI * .82 + (Math.PI * 1.64 * index) / Math.max(1, GRAPH.towns.length - 1)
+      ]));
+      for (const node of graphNodes) {
+        const random = hash(node.id);
+        const angle = ((random % 10000) / 10000) * Math.PI * 2;
+        const variation = (Math.floor(random / 10000) % 65) - 32;
+        let radius = 135;
+        if (node.type === "county") radius = 0;
+        else if (node.type === "area") radius = 72;
+        else if (node.type === "town") radius = 118;
+        else if (node.type === "village") {
+          const parentTown = links.find((edge) => edge.target === node.id && edge.label === "隶属乡镇");
+          const parentAngle = parentTown ? townAngle.get(parentTown.source) : angle;
+          node.x = centerX + Math.cos(parentAngle + angle * .12) * 245 + Math.cos(angle) * 28;
+          node.y = centerY + Math.sin(parentAngle + angle * .12) * 195 + Math.sin(angle) * 28;
+          node.vx = 0;
+          node.vy = 0;
+          continue;
+        } else if (node.type === "relic" || node.type === "intangible") radius = 360 + variation;
+        else radius = 245 + variation;
+        node.x = centerX + Math.cos(angle) * radius;
+        node.y = centerY + Math.sin(angle) * radius * .78;
+        node.vx = 0;
+        node.vy = 0;
+      }
+      const iterations = 230;
+      for (let step = 0; step < iterations; step++) {
+        const alpha = 1 - step / iterations;
+        const fx = new Float32Array(graphNodes.length);
+        const fy = new Float32Array(graphNodes.length);
+        for (let i = 0; i < graphNodes.length; i++) {
+          const a = graphNodes[i];
+          const dx0 = centerX - a.x;
+          const dy0 = centerY - a.y;
+          fx[i] += dx0 * .001;
+          fy[i] += dy0 * .001;
+          for (let j = i + 1; j < graphNodes.length; j++) {
+            const b = graphNodes[j];
+            let dx = a.x - b.x;
+            let dy = a.y - b.y;
+            let distance = Math.hypot(dx, dy);
+            if (distance < 1) {
+              const jitter = (hash(a.id + b.id) % 100) / 100;
+              dx = jitter + .2;
+              dy = .7 - jitter;
+              distance = Math.hypot(dx, dy);
+            }
+            const minDistance = nodeRadius(a) + nodeRadius(b) + 9;
+            if (distance < 118) {
+              const strength = ((118 - distance) / 118) * .45 * alpha;
+              const ux = dx / distance;
+              const uy = dy / distance;
+              fx[i] += ux * strength;
+              fy[i] += uy * strength;
+              fx[j] -= ux * strength;
+              fy[j] -= uy * strength;
+            }
+            if (distance < minDistance) {
+              const strength = ((minDistance - distance) / Math.max(1, minDistance)) * .8;
+              const ux = dx / distance;
+              const uy = dy / distance;
+              fx[i] += ux * strength;
+              fy[i] += uy * strength;
+              fx[j] -= ux * strength;
+              fy[j] -= uy * strength;
+            }
+          }
+        }
+        for (const edge of links) {
+          if (edge.layoutOnly) continue;
+          const source = byId.get(edge.source);
+          const target = byId.get(edge.target);
+          const dx = target.x - source.x;
+          const dy = target.y - source.y;
+          const distance = Math.max(1, Math.hypot(dx, dy));
+          const ideal = edge.distance || 94;
+          const strength = ((distance - ideal) / distance) * (edge.strength || .017) * alpha;
+          const sourceIndex = graphNodes.indexOf(source);
+          const targetIndex = graphNodes.indexOf(target);
+          fx[sourceIndex] += dx * strength;
+          fy[sourceIndex] += dy * strength;
+          fx[targetIndex] -= dx * strength;
+          fy[targetIndex] -= dy * strength;
+        }
+        for (let i = 0; i < graphNodes.length; i++) {
+          const node = graphNodes[i];
+          node.vx = (node.vx + fx[i]) * .72;
+          node.vy = (node.vy + fy[i]) * .72;
+          node.x += node.vx;
+          node.y += node.vy;
+        }
+      }
+      const minX = Math.min(...graphNodes.map((node) => node.x));
+      const maxX = Math.max(...graphNodes.map((node) => node.x));
+      const minY = Math.min(...graphNodes.map((node) => node.y));
+      const maxY = Math.max(...graphNodes.map((node) => node.y));
+      const fit = Math.min((state.width - 38) / (maxX - minX || 1), (state.height - 38) / (maxY - minY || 1), .95);
+      state.scale = Math.min(1.7, Math.max(.48, fit));
+      state.panX = state.width / 2 - ((minX + maxX) / 2) * state.scale;
+      state.panY = state.height / 2 - ((minY + maxY) / 2) * state.scale;
+    }
+
+    function draw() {
+      if (!state.width || !state.height) return;
+      const ratio = window.devicePixelRatio || 1;
+      context.setTransform(ratio, 0, 0, ratio, 0, 0);
+      context.clearRect(0, 0, state.width, state.height);
+      context.save();
+      context.translate(state.panX, state.panY);
+      context.scale(state.scale, state.scale);
+      const visible = state.viewIds;
+      for (const edge of links) {
+        if (visible && !visible.has(edge.source) && !visible.has(edge.target)) continue;
+        const source = byId.get(edge.source);
+        const target = byId.get(edge.target);
+        const highlighted = state.selected && (edge.source === state.selected || edge.target === state.selected);
+        context.beginPath();
+        context.moveTo(source.x, source.y);
+        context.lineTo(target.x, target.y);
+        context.strokeStyle = highlighted ? "rgba(164,82,61,.7)" : "rgba(101,111,94,.17)";
+        context.lineWidth = highlighted ? 1.7 : .85;
+        context.stroke();
+      }
+      for (const node of graphNodes) {
+        if (visible && !visible.has(node.id)) continue;
+        const category = CATEGORY_FOR_TYPE[node.type] || "plan";
+        const color = COLORS[category];
+        const radius = nodeRadius(node);
+        const highlighted = node.id === state.selected || node.id === state.hovered;
+        context.beginPath();
+        context.arc(node.x, node.y, radius + (highlighted ? 2 : 0), 0, Math.PI * 2);
+        context.fillStyle = color;
+        context.globalAlpha = visible && state.viewIds && !state.viewIds.has(node.id) ? .18 : 1;
+        context.fill();
+        context.globalAlpha = 1;
+        if (highlighted) {
+          context.beginPath();
+          context.arc(node.x, node.y, radius + 5, 0, Math.PI * 2);
+          context.strokeStyle = "rgba(164,82,61,.48)";
+          context.lineWidth = 1;
+          context.stroke();
+        }
+        const labelThreshold = node.type === "village" ? .7 : .58;
+        if (state.scale >= labelThreshold || highlighted || node.type === "county" || node.type === "area") {
+          context.font = `${highlighted ? "600 " : ""}${node.type === "county" || node.type === "area" ? 12 : 10}px "Microsoft YaHei", sans-serif`;
+          context.textAlign = "center";
+          context.textBaseline = "top";
+          context.lineWidth = 3.2;
+          context.strokeStyle = "rgba(255,254,250,.96)";
+          context.strokeText(node.label, node.x, node.y + radius + 3);
+          context.fillStyle = highlighted ? "#293b33" : "#586457";
+          context.fillText(node.label, node.x, node.y + radius + 3);
+        }
+      }
+      context.restore();
+    }
+
+    function resize() {
+      const rect = graphWrap.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      state.width = rect.width;
+      state.height = rect.height;
+      const ratio = window.devicePixelRatio || 1;
+      canvas.width = Math.round(rect.width * ratio);
+      canvas.height = Math.round(rect.height * ratio);
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
+      if (!graphNodes[0].x || !graphNodes[0].y) initializePositions();
+      draw();
+    }
+
+    function selectNode(node) {
+      state.selected = node ? node.id : "";
+      renderDetails(node);
+      draw();
+    }
+
+    function renderDetails(node) {
+      const container = document.querySelector("#detail-content");
+      container.replaceChildren();
+      if (!node) {
+        const hint = document.createElement("div");
+        hint.className = "selection-hint";
+        hint.textContent = "请选择图谱中的节点，查看来源信息与关联条目。";
+        container.append(hint);
+        return;
+      }
+      const type = document.createElement("div");
+      type.className = "record-type";
+      const dot = document.createElement("span");
+      dot.className = "legend-dot";
+      dot.style.backgroundColor = COLORS[CATEGORY_FOR_TYPE[node.type] || "plan"];
+      type.append(dot, document.createTextNode(TYPE_NAMES[node.type] || node.type));
+      const title = document.createElement("h2");
+      title.className = "record-name";
+      title.textContent = node.label;
+      const summary = document.createElement("p");
+      summary.className = "record-summary";
+      summary.textContent = node.description || "该条目见于规划报告及村落遗产统计表。";
+      container.append(type, title, summary);
+
+      if (node.type === "village" && node.facts) {
+        const facts = document.createElement("div");
+        facts.className = "record-facts";
+        for (const [label, value] of [
+          ["所属乡镇", node.facts.town], ["户籍人口", `${numberFormat(node.facts.registered)} 人`],
+          ["常住人口", `${numberFormat(node.facts.resident)} 人`], ["空心率", `${Math.round(node.facts.hollow * 100)}%`],
+          ["历史建筑", `${numberFormat(node.facts.historic)} 处`], ["一般文物点", `${numberFormat(node.facts.general)} 处`],
+          ["非遗项目", `${node.facts.heritageTotal} 项`], ["重点文保单位", `${node.facts.provincialRelicCount + node.facts.nationalRelicCount} 处`]
+        ]) {
+          const fact = document.createElement("div");
+          fact.className = "fact";
+          const labelElement = document.createElement("span");
+          labelElement.textContent = label;
+          const valueElement = document.createElement("strong");
+          valueElement.textContent = value;
+          fact.append(labelElement, valueElement);
+          facts.append(fact);
+        }
+        container.append(facts);
+      }
+
+      const connected = linksByNode.get(node.id) || [];
+      const heading = document.createElement("h3");
+      heading.className = "connected-heading";
+      heading.textContent = `关联条目 · ${connected.length}`;
+      const list = document.createElement("div");
+      list.className = "connection-list";
+      const relationships = new Map();
+      for (const item of connected) {
+        const key = `${item.label}::${item.node.id}`;
+        if (!relationships.has(key)) relationships.set(key, item);
+      }
+      for (const item of [...relationships.values()].sort((a, b) => a.node.label.localeCompare(b.node.label, "zh-CN"))) {
+        const chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "connection-chip";
+        chip.textContent = `${item.label} · ${item.node.label}`;
+        chip.title = `${item.label}：${item.node.label}`;
+        chip.addEventListener("click", () => selectNode(item.node));
+        list.append(chip);
+      }
+      container.append(heading, list);
+      const source = document.createElement("div");
+      source.className = "source-line";
+      source.textContent = node.source || "来源：井陉县传统村落集中连片保护利用规划（2022—2035年）总报告";
+      container.append(source);
+    }
+
+    function buildLegend() {
+      const legend = document.querySelector("#legend");
+      for (const type of ["county","area","town","village","relic","intangible","typology","layout","theme"]) {
+        if (!typeCounts.has(type)) continue;
+        const item = document.createElement("li");
+        item.className = "legend-item";
+        const dot = document.createElement("span");
+        dot.className = "legend-dot";
+        dot.style.backgroundColor = COLORS[CATEGORY_FOR_TYPE[type] || "plan"];
+        const label = document.createElement("span");
+        label.textContent = `${TYPE_NAMES[type]}（${typeCounts.get(type)}）`;
+        item.append(dot, label);
+        legend.append(item);
+      }
+      const options = document.querySelector("#type-filter");
+      for (const type of Object.keys(TYPE_NAMES)) {
+        if (!typeCounts.has(type)) continue;
+        const option = document.createElement("option");
+        option.value = type;
+        option.textContent = TYPE_NAMES[type];
+        options.append(option);
+      }
+    }
+
+    function applySearch() {
+      const query = document.querySelector("#search").value.trim().toLocaleLowerCase();
+      const type = document.querySelector("#type-filter").value;
+      const matches = graphNodes.filter((node) =>
+        (!type || node.type === type) &&
+        (!query || `${node.label} ${node.description || ""} ${node.keywords || ""}`.toLocaleLowerCase().includes(query))
+      );
+      if (!query && !type) {
+        state.viewIds = null;
+        document.querySelector("#search-count").textContent = `全部 ${graphNodes.length} 个节点`;
+        draw();
+        return;
+      }
+      const visible = new Set(matches.map((node) => node.id));
+      for (const edge of links) {
+        if (visible.has(edge.source) || visible.has(edge.target)) {
+          visible.add(edge.source);
+          visible.add(edge.target);
+        }
+      }
+      state.viewIds = visible;
+      document.querySelector("#search-count").innerHTML = `匹配 <strong>${matches.length}</strong> 个节点 · 显示其直接关联`;
+      draw();
+    }
+
+    function graphPosition(event) {
+      const rect = canvas.getBoundingClientRect();
+      return { x: event.clientX - rect.left, y: event.clientY - rect.top };
+    }
+
+    function nodeAt(position) {
+      const pointX = (position.x - state.panX) / state.scale;
+      const pointY = (position.y - state.panY) / state.scale;
+      let nearest = null;
+      let shortest = Infinity;
+      for (const node of graphNodes) {
+        if (state.viewIds && !state.viewIds.has(node.id)) continue;
+        const distance = Math.hypot(node.x - pointX, node.y - pointY);
+        const hit = Math.max(12 / state.scale, nodeRadius(node) + 5);
+        if (distance < hit && distance < shortest) {
+          nearest = node;
+          shortest = distance;
+        }
+      }
+      return nearest;
+    }
+
+    function downloadGraph() {
+      const data = JSON.stringify({
+        title: "井陉县传统村落集中连片保护利用知识图谱",
+        source: "井陉县传统村落集中连片保护利用规划（2022—2035年）总报告",
+        nodes: GRAPH.nodes,
+        edges: GRAPH.edges
+      }, null, 2);
+      const url = URL.createObjectURL(new Blob([data], { type: "application/json;charset=utf-8" }));
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "井陉传统村落保护利用知识图谱.json";
+      link.click();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function numberFormat(value) {
+      return new Intl.NumberFormat("zh-CN").format(safeNumber(value));
+    }
+
+    canvas.addEventListener("pointerdown", (event) => {
+      const position = graphPosition(event);
+      const node = nodeAt(position);
+      state.drag = { x: position.x, y: position.y, moved: false };
+      canvas.setPointerCapture(event.pointerId);
+      if (node) selectNode(node);
+    });
+    canvas.addEventListener("pointermove", (event) => {
+      const position = graphPosition(event);
+      if (state.drag && event.buttons) {
+        const dx = position.x - state.drag.x;
+        const dy = position.y - state.drag.y;
+        if (Math.abs(dx) + Math.abs(dy) > 2) state.drag.moved = true;
+        state.panX += dx;
+        state.panY += dy;
+        state.drag.x = position.x;
+        state.drag.y = position.y;
+        draw();
+      }
+      const hit = nodeAt(position);
+      const hover = hit ? hit.id : "";
+      canvas.style.cursor = state.drag && event.buttons ? "grabbing" : (hit ? "pointer" : "grab");
+      if (hover !== state.hovered) {
+        state.hovered = hover;
+        draw();
+      }
+    });
+    canvas.addEventListener("pointerup", (event) => {
+      if (state.drag && !state.drag.moved) {
+        const hit = nodeAt(graphPosition(event));
+        if (hit) selectNode(hit);
+      }
+      state.drag = null;
+    });
+    canvas.addEventListener("pointercancel", () => { state.drag = null; });
+    canvas.addEventListener("wheel", (event) => {
+      event.preventDefault();
+      const position = graphPosition(event);
+      const oldScale = state.scale;
+      const newScale = Math.max(.35, Math.min(2.8, oldScale * (event.deltaY < 0 ? 1.12 : .89)));
+      state.panX = position.x - (position.x - state.panX) * (newScale / oldScale);
+      state.panY = position.y - (position.y - state.panY) * (newScale / oldScale);
+      state.scale = newScale;
+      draw();
+    }, { passive: false });
+    document.querySelector("#search").addEventListener("input", applySearch);
+    document.querySelector("#type-filter").addEventListener("change", applySearch);
+    document.querySelector("#reset-view").addEventListener("click", () => {
+      document.querySelector("#search").value = "";
+      document.querySelector("#type-filter").value = "";
+      state.selected = "";
+      state.viewIds = null;
+      renderDetails(null);
+      initializePositions();
+      applySearch();
+    });
+    document.querySelector("#download-data").addEventListener("click", downloadGraph);
+    window.addEventListener("resize", resize);
+
+    document.querySelector("#stat-villages").textContent = String(GRAPH.nodes.filter((node) => node.type === "village").length);
+    document.querySelector("#stat-nodes").textContent = new Intl.NumberFormat("zh-CN").format(GRAPH.nodes.length);
+    document.querySelector("#stat-links").textContent = new Intl.NumberFormat("zh-CN").format(GRAPH.edges.length);
+    buildLegend();
+    resize();
+    applySearch();
+  </script>
+</body>
+</html>
